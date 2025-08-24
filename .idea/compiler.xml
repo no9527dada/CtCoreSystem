@@ -11,7 +11,7 @@
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.java.dev.jna/jna-platform/5.10.0/fbed7d9669dba47714ad0d4f4454290a997aee69/jna-platform-5.10.0.jar" />
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.java.dev.jna/jna/5.10.0/7cf4c87dd802db50721db66947aa237d7ad09418/jna-5.10.0.jar" />
         </processorPath>
-        <module name="CtCoreSystem.main" />
+        <module name="CT系统v8.main" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="1.8" />

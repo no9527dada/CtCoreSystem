@@ -103,6 +103,7 @@ public class CtCoreSystem extends Mod {
         }
         //禁用自动存档模组;
         disableModIfExists("auto_saver");
+
         DsShaders.load();//电力节点力场的动画效果
         //  if(!settings.getBool("cthind")) {
         new CT3FxEffect();

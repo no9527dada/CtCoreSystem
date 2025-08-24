@@ -15,6 +15,7 @@ import mindustry.ui.dialogs.JoinDialog;
 import mindustry.ui.dialogs.ModsDialog;
 
 import static CtCoreSystem.CoreSystem.type.CTColor.C;
+import static CtCoreSystem.CtURL.QQ群2;
 import static CtCoreSystem.ui.dialogs.CT3InfoDialog.ct3info;
 import static mindustry.Vars.turnDuration;
 import static mindustry.Vars.universe;
@@ -29,9 +30,6 @@ public class CT3function {
         Mods.LoadedMod mod = Vars.mods.getMod("ctcoresystem");
         String version = mod.meta.version;
 
-
-
-        String QQ群2 = "https://jq.qq.com/?_wv=1027&k=oygqLbJ5";
         功能图标UI = new BaseDialog("[yellow]Creators[#7bebf2] " + version + "[] Adapt 146+" + "\n策划:9527，贴图:皴皲，处理器逻辑指导:咕咕点心\nQQ群:909130592") {{
             addCloseListener();//按esc关闭
             buttons.defaults().size(210, 64);

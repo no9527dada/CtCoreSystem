@@ -18,6 +18,8 @@ import mindustry.ui.dialogs.BaseDialog;
 
 import java.util.Objects;
 
+import static CtCoreSystem.CtURL.QQ群2;
+import static CtCoreSystem.CtURL.网盘;
 import static arc.Core.settings;
 import static mindustry.Vars.*;
 
@@ -26,9 +28,8 @@ public class ctUpdateDialog {
     private static BaseDialog ct3info2;
     private static BaseDialog updateDialog;
     private static BaseDialog contentDialog;
-    static String QQ群 = "https://jq.qq.com/?_wv=1027&k=oygqLbJ5";
-    //static String 网盘 = "https://pan.quark.cn/s/adbe4b24ae26";//V7
-    static String 网盘 =  "https://pan.quark.cn/s/571579daddcf";//V8
+
+
     public static String toText(String str) {
         return Core.bundle.format(str);
     }
@@ -339,9 +340,9 @@ public class ctUpdateDialog {
                 }
             })).size(300, 50).row();
             table.button(Core.bundle.format("QQ群2"), (() -> {
-                if (!Core.app.openURI(QQ群)) {
+                if (!Core.app.openURI(QQ群2)) {
                     Vars.ui.showErrorMessage("@linkfail");
-                    Core.app.setClipboardText(QQ群);
+                    Core.app.setClipboardText(QQ群2);
                 }
             })).size(300, 64).row();
             table.button("@close", (contentDialog::hide)).size(100, 64).labelAlign(Align.center);//关闭按钮

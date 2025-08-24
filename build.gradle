@@ -19,7 +19,7 @@ java{
 
 ext{
     //the build number that this mod is made for
-    mindustryVersion = 'v147.1'
+    mindustryVersion = 'v150'
     jabelVersion = "0.8.0"
     //windows sucks
     isWindows = System.getProperty("os.name").toLowerCase().contains("windows")
@@ -39,7 +39,7 @@ dependencies{
     compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
     annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
 
-    compileOnly files("G:\\JAVA_MDT\\Mindustry(1).jar")
+   compileOnly files("F:\\JAVA_MDT\\CT2起源\\build\\libs\\CT2起源源码.jar")
 
 }
 

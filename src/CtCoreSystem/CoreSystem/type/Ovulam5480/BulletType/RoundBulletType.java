@@ -11,14 +11,15 @@ import mindustry.gen.Bullet;
 import mindustry.graphics.Pal;
 
 import static arc.scene.actions.Actions.color;
+
 //转圈子弹
 public class RoundBulletType extends BulletType {
     public float radius = 48f;
     public float angle = 22f;
 
-    public RoundBulletType(){
+    public RoundBulletType() {
         speed = 0;
-        lifetime =120f;
+        lifetime = 120f;
         despawnEffect = Fx.none;
         collides = false;
         hittable = false;
@@ -42,7 +43,7 @@ public class RoundBulletType extends BulletType {
         float rfin = (1 + e.fin() * 2) / 3f;
 
         rand.setSeed(e.id);
-        for(int i = 0; i < 20; i++){
+        for (int i = 0; i < 20; i++) {
             float ang = angle + rand.range(14f) + 89f;
             Lines.lineAngle(e.x + x + rand.range(spread) * rfin, e.y + y + rand.range(spread) * rfin, ang, e.fout() * 10f * rand.random(1f) + 1f);
         }
@@ -57,7 +58,7 @@ public class RoundBulletType extends BulletType {
         e.at(b.x, b.y, a, radius);
 
         if (b.timer(1, 5)) {
-            for (int i = 0; i < 12; i++){
+            for (int i = 0; i < 12; i++) {
                 float an = a + 30 * i;
 
                 float x = Mathf.cosDeg(an) * radius + b.x;
@@ -67,7 +68,7 @@ public class RoundBulletType extends BulletType {
                 float y2 = Mathf.sinDeg(an + 30) * radius + b.y;
                 float dst = Mathf.dst(x, y, x2, y2);
 
-                Damage.collideLine(b, b.team, Fx.none, x, y, an + 90, dst, true, false, pierceCap);
+                Damage.collideLine(b, b.team,/* Fx.none,*/ x, y, an + 90, dst, true, false, pierceCap);
             }
         }
     }

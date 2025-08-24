@@ -6,11 +6,13 @@ import arc.util.Align;
 import arc.util.Time;
 import mindustry.Vars;
 import mindustry.ui.dialogs.BaseDialog;
+
+import static CtCoreSystem.CtURL.QQ群2;
+import static CtCoreSystem.CtURL.爱发电;
 //爱发电
 
 public class Award9527 extends BaseDialog {
-   String https = "https://afdian.com/a/creators2";
-    String QQ群2 = "https://jq.qq.com/?_wv=1027&k=oygqLbJ5";
+
     public Award9527() {
         super("@love9527");
         addCloseListener();//按esc关闭
@@ -27,9 +29,9 @@ public class Award9527 extends BaseDialog {
             t.image().color(Color.valueOf("69dcee")).fillX().height(3).pad(9);//分割线
             t.row();
             t.button(Core.bundle.format("weixin"), (() -> {
-                if (!Core.app.openURI(https)) {
+                if (!Core.app.openURI(爱发电)) {
                     Vars.ui.showErrorMessage("@linkfail");
-                    Core.app.setClipboardText(https);
+                    Core.app.setClipboardText(爱发电);
                 }
             })).size(510, 64).row();
             t.add(Core.bundle.format("creators_KHHF")).left().growX().wrap().width(620).maxWidth(620).pad(4).labelAlign(Align.left).row();//捐赠说明

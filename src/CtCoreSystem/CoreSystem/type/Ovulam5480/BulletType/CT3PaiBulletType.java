@@ -99,7 +99,7 @@ public class CT3PaiBulletType extends BasicBulletType {
         float x1 = 子弹宽度 / 2f * Mathf.cosDeg(b.rotation() - 90) + b.x;
         float y1 = 子弹宽度 / 2f * Mathf.sinDeg(b.rotation() - 90) + b.y;
 
-        Damage.collideLine(b, b.team, hitEffect, x1, y1, b.rotation() + 90f, currentLength(b), largeHit, false, pierceCap);
+        Damage.collideLine(b, b.team,/* hitEffect,*/ x1, y1, b.rotation() + 90f, currentLength(b), largeHit, false, pierceCap);
     }
 
     public float currentLength(Bullet b){

@@ -118,11 +118,11 @@ public class CTClib {
     public static void damageLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length,
                                   boolean large, PierceType pierce) {
         if (pierce == PierceType.NORMAL) {
-            Damage.collideLine(hitter, team, effect, x, y, angle, length, large, true);
+            Damage.collideLine(hitter, team/*, effect*/, x, y, angle, length, large, true);
         } else if (pierce == PierceType.BLOCKING) {
-            Damage.collideLine(hitter, team, effect, x, y, angle, length, large, true, 1);
+            Damage.collideLine(hitter, team/*, effect*/, x, y, angle, length, large, true, 1);
         } else {
-            Damage.collideLine(hitter, team, effect, x, y, angle, length, large, false);
+            Damage.collideLine(hitter, team/*, effect*/, x, y, angle, length, large, false);
         }
     }
 }

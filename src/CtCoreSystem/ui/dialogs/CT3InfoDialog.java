@@ -1,5 +1,6 @@
 package CtCoreSystem.ui.dialogs;
 
+import CtCoreSystem.mfxiao.激活进入;
 import CtCoreSystem.ui.Award9527;
 import arc.Core;
 import arc.graphics.Color;
@@ -14,9 +15,10 @@ import mindustry.mod.Mods;
 import mindustry.ui.dialogs.BaseDialog;
 
 import static CtCoreSystem.CoreSystem.type.CTColor.C;
+import static CtCoreSystem.CtURL.*;
 
 
-//首页
+//首页 开屏
 public class CT3InfoDialog {
     public static BaseDialog ct3info;
 
@@ -31,10 +33,7 @@ public class CT3InfoDialog {
        // String versionTD =  Vars.mods.getMod("ctcoresystem").meta.version;
 
         String MODname = Core.bundle.format("planet.ct3.ModName");
-        String QQ群2 = "https://jq.qq.com/?_wv=1027&k=oygqLbJ5";
-        String 网盘 = "https://pan.quark.cn/s/571579daddcf";
-        String TDGit = "https://github.com/no9527dada/CreatorTD/releases";
-        String FPGit = "https://github.com/no9527dada/CT3FantasyProject/releases";
+
 
         ct3info = new BaseDialog("[yellow]Creators[#7bebf2] " + version + "[] Adapt 146+" + "\n策划:9527，贴图:皴皲，处理器逻辑指导:咕咕点心\nQQ群:909130592") {{
             //更新检查
@@ -46,13 +45,18 @@ public class CT3InfoDialog {
             cont.pane((table -> {
                 table.add(MODname).left().growX().wrap().width(620).maxWidth(620).pad(4).labelAlign(Align.left);
                 table.row();
-
+                //  new SettingsMenuDialog().show();//原版设置界面 现在不需要
                 table.image().color(Color.valueOf("69dcee")).fillX().height(3).pad(3);
                 table.row();
                 if(Vars.mods.locateMod("creators")==null){
                 table.image(Core.atlas.find("ctcoresystem-CT-logo", Core.atlas.find("clear"))).height(290).width(587).pad(3).row();
                 }else {
                     table.image(Core.atlas.find("ctcoresystem-CT2-logo", Core.atlas.find("clear"))).height(290).width(587).pad(3).row();
+                    table.button("起源额外内容激活", () -> {
+
+                        激活进入.show();
+
+                    }).size(280, 64).left().row();
                 }
 
                 table.add("更新内容:").left().growX().wrap().width(620).maxWidth(620).pad(4).labelAlign(Align.left);
@@ -114,6 +118,7 @@ public class CT3InfoDialog {
                     buttons.defaults().size(210, 64);
                     buttons.button("@close", (this::hide)).size(100, 64);//关闭按钮
                     cont.pane((table -> {
+
                         table.button("@CT3HX", (() -> {//幻想
                             new BaseDialog("[yellow]Creators[#7bebf2] " + version + "\n" + CT3framer + "\nQQ群:909130592") {{
                                 addCloseListener();//按esc关闭
