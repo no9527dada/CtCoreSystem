@@ -516,7 +516,35 @@ public class TDBuffChange {
             }
         }
     }
+    //无限火力开关方块 逻辑控制 0关闭 1开启
+    public static class 无限火力开关 extends Block {
+        public 无限火力开关(String name) {
+            super(name);
+            update = true;
+            sync = true;
+            canOverdrive = false;
+            targetable = false;
+            forceDark = true;
+            privileged = true;
+            size = 1;
+            requirements(Category.logic, BuildVisibility.sandboxOnly, with(物品, 1));
+        }
+        @Override
+        public boolean canBreak(Tile tile) {
+            return Vars.state.rules.infiniteResources||!privileged || state.rules.editor || state.playtestingMap != null;
+        }
+        public class 无限火力开关Build extends Building {
+            @Override
+            public void control(LAccess type, double p1, double p2, double p3, double p4) {
+                if(type == LAccess.shootp){
+                    Vars.state.rules.teams.get(Team.get((int)p1)).cheat = !Mathf.zero(p2);
+                }
+                super.control(type, p1, p2, p3, p4);
+              Vars.state.rules.teams.get(Team.sharded).cheat=false;
+            }
 
+        }
+    }
 
 
 

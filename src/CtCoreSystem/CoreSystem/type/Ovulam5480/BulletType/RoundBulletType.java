@@ -16,19 +16,7 @@ import static arc.scene.actions.Actions.color;
 public class RoundBulletType extends BulletType {
     public float radius = 48f;
     public float angle = 22f;
-
-    public RoundBulletType() {
-        speed = 0;
-        lifetime = 120f;
-        despawnEffect = Fx.none;
-        collides = false;
-        hittable = false;
-
-        pierce = true;
-        //pierceCap = 999;
-    }
-
-    public static final Rand rand = new Rand();
+    private static final Rand rand = new Rand();
     public Effect e = new Effect(20f, e -> {
         color(Pal.accent);
         Lines.stroke(e.fout() * 2);
@@ -49,6 +37,22 @@ public class RoundBulletType extends BulletType {
         }
     });
 
+    public RoundBulletType() {
+        speed = 0;
+        lifetime = 120f;
+        despawnEffect = Fx.none;
+        collides = false;
+        hittable = false;
+        pierce = true;
+        //pierceCap = 999;
+    }
+
+    public void setStats() {
+    }
+    @Override
+    public float continuousDamage(){
+        return damage  * 12f;
+    }
     @Override
     public void update(Bullet b) {
         super.update(b);

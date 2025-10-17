@@ -24,7 +24,7 @@ CreatorsModJS.RunName.add("ctcoresystem")
 CreatorsModJS.DawnRun.add(run(() => { }));
 
 
-require('gong_neng');
+//require('gong_neng');
 if ((Vars.mods.locateMod("creators") != null)) {
 	require('biansu2');
 }{};

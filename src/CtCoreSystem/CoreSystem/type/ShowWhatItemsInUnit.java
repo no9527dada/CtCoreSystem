@@ -49,6 +49,7 @@ public class ShowWhatItemsInUnit extends Ability {
         for (ItemStack itemStack : itemStacks) {
             t.add(itemStack.amount + "x");
             Image image = new Image(itemStack.item.fullIcon);
+            t.add(itemStack.item.localizedName+" " );
             t.add(image);
             t.row();
         }

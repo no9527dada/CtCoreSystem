@@ -29,7 +29,8 @@ Events.on(EventType.ClientLoadEvent, cons(e => {
     kaite.disabled = Tex.buttonDisabled;
 
     Vars.ui.hudGroup.fill(cons(table => {
-    var locloseAnAccounve = new BaseDialog("");
+
+        var locloseAnAccounve = new BaseDialog("");
         locloseAnAccounve.buttons.button("@close", run(() => {
             locloseAnAccounve.hide();
         })).size(210, 64);
@@ -47,11 +48,11 @@ Events.on(EventType.ClientLoadEvent, cons(e => {
                 buttonn.setText(Core.bundle.get("jiesuan") + UI.formatTime(ticks));
             })
             table.row();
-           table.button("@tongji2", Icon.info,run(() => {
+            table.button("@tongji2", Icon.info, run(() => {
                 let sector = Vars.state.getSector();
-                if (sector != null&&sector.save != null) {
+                if (sector != null && sector.save != null) {
                     Reflect.invoke(CTui.CTplanet, "showStats", [Vars.state.getSector()], Sector);
-                   // CTui.CTplanet, "showStats", [Vars.state.getSector()], Sector
+                    // CTui.CTplanet, "showStats", [Vars.state.getSector()], Sector
                 }
             })).size(250, 64).padLeft(-400).padTop(20);
             table.button(Core.bundle.format("gonglue"), run(() => {
@@ -60,13 +61,13 @@ Events.on(EventType.ClientLoadEvent, cons(e => {
                     Core.app.setClipboardText(https4);
                 }
             })).size(250, 64).padLeft(-400).padTop(20);
-    /*         table.button(Icon.info, kaite, () => {
-                let sector = Vars.state.getSector();
-                if (sector != null&&sector.save != null) {
-                    Reflect.invoke(CTui.CTplanet, "showStats", [Vars.state.getSector()], Sector);
-                   // CTui.CTplanet, "showStats", [Vars.state.getSector()], Sector
-                }
-            }, null, "tongji"); //统计  */
+            /*         table.button(Icon.info, kaite, () => {
+                        let sector = Vars.state.getSector();
+                        if (sector != null&&sector.save != null) {
+                            Reflect.invoke(CTui.CTplanet, "showStats", [Vars.state.getSector()], Sector);
+                           // CTui.CTplanet, "showStats", [Vars.state.getSector()], Sector
+                        }
+                    }, null, "tongji"); //统计  */
             return table;
         })()).grow().center().maxWidth(770);
         //-------------------------------------------
@@ -76,16 +77,13 @@ Events.on(EventType.ClientLoadEvent, cons(e => {
         }).checked(b => shown).size(40).left().row();
         table.collapser(t => {
             t.top().left();
-
             let buttons = t.table().left().get();
-
             function addButton(icon, style, runnable, checked, tooltipName) {
                 let cell = buttons.button(icon, style, 36, runnable).size(46).tooltip(Core.bundle.get(tooltipName));
                 if (checked != null) {
                     cell.checked(checked);
                 }
             }
-
             addButton(Icon.home, kaite, () => {
                 CT3function.功能图标UI.show();
             }, null, "9527shouye"); // 首页
@@ -94,11 +92,11 @@ Events.on(EventType.ClientLoadEvent, cons(e => {
                 Call.sendChatMessage("/sync")
             }, null, "refresh"); // 刷新
 
-if (Vars.mods.locateMod("creators") != null) {
-            addButton(Icon.book, Styles.clearTogglei, () => {
-                Creators.CTBlockBool = !Creators.CTBlockBool;
-            }, b => Creators.CTBlockBool, "9527lantu"); // 蓝图
-}
+            if (Vars.mods.locateMod("creators") != null) {
+                addButton(Icon.book, Styles.clearTogglei, () => {
+                    Creators.CTBlockBool = !Creators.CTBlockBool;
+                }, b => Creators.CTBlockBool, "9527lantu"); // 蓝图
+            }
             addButton(Icon.eye, Styles.clearTogglei, () => {
                 let c = Core.settings.get("effects", true);
                 Core.settings.put("effects", !c);
@@ -127,7 +125,7 @@ if (Vars.mods.locateMod("creators") != null) {
         if (
             //在加载了自动存档模组后执行自动存档
             Vars.mods.locateMod("auto_saver") == null
-            ) {
+        ) {
             //原版的存档方式
             function exportData(fi) {
                 Vars.ui.settings.exportData(fi)
@@ -157,12 +155,12 @@ if (Vars.mods.locateMod("creators") != null) {
         } else {
 
             //自动存档方式
-            let  mod = Vars.mods.locateMod("auto_saver");
-            if(mod.main == null) return;
-            let  dialog = Reflect.get(mod.main, "recoverDialog");
+            let mod = Vars.mods.locateMod("auto_saver");
+            if (mod.main == null) return;
+            let dialog = Reflect.get(mod.main, "recoverDialog");
             cundang.button(Icon.upload, Styles.defaulti, run(() => {
-                 dialog.show();
-                })).width(40).height(40).name("ores").tooltip("@data.export");
+                dialog.show();
+            })).width(40).height(40).name("ores").tooltip("@data.export");
             //  Reflect.invoke(?????)
         }
         cundang.top().left().marginTop(110).marginLeft(40);

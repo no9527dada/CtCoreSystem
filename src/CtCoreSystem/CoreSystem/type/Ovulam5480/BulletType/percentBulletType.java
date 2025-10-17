@@ -21,6 +21,8 @@ public class percentBulletType {
                 h.damagePierce(h.maxHealth() * percent / 100);
             }
             super.hitEntity(b, entity, health);
+            absorbable = false;//子弹不被护盾仪吸收
+            damage = 0;//伤害为0
         }
     }
     public static class healthBulletType extends BasicBulletType {

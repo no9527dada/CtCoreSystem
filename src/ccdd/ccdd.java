@@ -1,6 +1,5 @@
 package ccdd;
 
-import CtCoreSystem.ui.dialogs.SettingDifficultyDialog;
 import arc.Core;
 import arc.Events;
 import mindustry.Vars;

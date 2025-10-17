@@ -1,34 +1,23 @@
-package CtCoreSystem.ui.dialogs;
+package CtCoreSystem.ui.NanDu;
 /*
  *@Author:LYBF
  *@Date  :2023/12/24
  */
 //难度
+import CtCoreSystem.mfxiao.ActivateProgram;
 import arc.Core;
 
-import arc.func.Boolc;
-import arc.func.Boolp;
-import arc.func.Floatc;
 import arc.graphics.Color;
-import arc.scene.Element;
 import arc.scene.event.Touchable;
-import arc.scene.ui.ButtonGroup;
 import arc.scene.ui.Dialog;
 import arc.scene.ui.Label;
 import arc.scene.ui.Slider;
 import arc.scene.ui.layout.Table;
 import arc.util.Align;
-import arc.util.Log;
-import mindustry.Vars;
-import mindustry.game.CampaignRules;
-import mindustry.game.Difficulty;
-import mindustry.gen.Tex;
 import mindustry.type.Planet;
 import mindustry.ui.Styles;
-import mindustry.ui.dialogs.SettingsMenuDialog;
 
-import java.util.Objects;
-
+import static CtCoreSystem.CtCoreSystem.主动关闭激活;
 import static arc.Core.bundle;
 
 public class SettingDifficultyDialog extends Dialog {
@@ -52,8 +41,20 @@ public class SettingDifficultyDialog extends Dialog {
      public void addChangeDiffcutySlider(boolean 加载CT2) {
         // CampaignRules rules = planet.campaignRules;
          Table table = new Table();
-         Slider slider = new Slider(1, 加载CT2 ? 6 : 4, 1, false);
+
+        /* 未激活状态：难度范围1-4级（CT2模式为1-6级）
+         *已激活状态：（CT2模式为1-4级）
+         */
+         //主动关闭激活 == true
+       //  Slider slider = !ActivateProgram.isActivated ? new Slider(1, 加载CT2 ? 6 : 4, 1, false) : new Slider(1, 加载CT2 ? 4 : 4, 1, false);
+
+
+         Slider slider = (!ActivateProgram.isActivated || 主动关闭激活)
+                 ? new Slider(1, 加载CT2 ? 6 : 4, 1, false)
+                 : new Slider(1, 加载CT2 ? 4 : 4, 1, false);
+
          slider.setValue(Core.settings.getInt("游戏难度"));
+
          Label value = new Label("", Styles.outlineLabel);
          Table content = new Table();
          content.add("难度设置", Styles.outlineLabel).left().growX().wrap();
@@ -63,18 +64,45 @@ public class SettingDifficultyDialog extends Dialog {
          slider.changed(() -> {
              //滑动时触发
              int value1 = (int) slider.getValue();
-             value.setText(bundle.get(((加载CT2 ? "" : "CT3") + "Difficulty-" + value1)));
+
+             value.setText(bundle.get(
+                     (!ActivateProgram.isActivated || 主动关闭激活) ? ((加载CT2 ? "" : "CT3") + "Difficulty-" + value1) : ((加载CT2 ? "isActivated" : "CT3") + "Difficulty-" + value1)
+
+             ));
+
+
              //保存难度
              Core.settings.put("游戏难度", value1);
          });
          slider.change();
          table.stack(slider, content).width(Math.min(Core.graphics.getWidth() / 1.2f, 460f)).center().padTop(4f).get();
          table.row();
-         table.image(Core.atlas.find(加载CT2 ? "ctcoresystem-nandu2" : "ctcoresystem-nandu3")).height(185).width(445).pad(3);//难度图片公示
+         if (!ActivateProgram.isActivated) {
+             table.image(Core.atlas.find(加载CT2 ? "ctcoresystem-nandu2" : "ctcoresystem-nandu3")).height(185).width(445).pad(3);//难度图片公示
+         }else {
+             if (主动关闭激活)
+             {
+
+                 if (加载CT2) {
+                     table.image(Core.atlas.find("ctcoresystem-nandu2")).height(185).width(450).pad(3);//难度图片公示
+                 } else {
+                     table.image(Core.atlas.find("ctcoresystem-nandu3")).height(185).width(445).pad(3);//难度图片公示
+                 }
+
+             }else {
+                 if (加载CT2) {
+                     table.image(Core.atlas.find("ctcoresystem-nandu2+")).height(125).width(450).pad(3);//难度图片公示
+                 } else {
+                     table.image(Core.atlas.find("ctcoresystem-nandu3")).height(185).width(445).pad(3);//难度图片公示
+                 }
+             }
+
+
+         }
          table.row();
          table.image().color(Color.valueOf("69dcee")).fillX().height(3).pad(9);
          table.row();
-         table.add(加载CT2 ?"[yellow]当前为CT2难度":"[yellow]当前为CT3难度").left().growX().wrap().width(200).maxWidth(200).pad(4).row();
+         table.add( /*ActivateProgram.isActivated  ? "[yellow]当前为CT2难度([#ff0000]激活模式[]）" :*/ 加载CT2 ?"[yellow]当前为CT2难度":"[yellow]当前为CT3难度").left().growX().wrap().width(200).maxWidth(200).pad(4).row();
          table.add(Core.bundle.get("TD难度调整说明")).center().growX().wrap().width(500).maxWidth(500).pad(4).labelAlign(Align.center).row();
 /*         cont.pane((e -> {
                      e.check("@rules.fog", b -> rules.fog = b);

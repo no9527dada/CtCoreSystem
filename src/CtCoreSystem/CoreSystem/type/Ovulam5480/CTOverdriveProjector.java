@@ -7,6 +7,8 @@ import arc.util.Time;
 import mindustry.graphics.Layer;
 import mindustry.world.blocks.defense.OverdriveProjector;
 
+import static CtCoreSystem.CoreSystem.type.CTColor.C;
+
 //超速仪的范围圈动画
 public class CTOverdriveProjector extends OverdriveProjector {
     public float 间隔 = 180f;
@@ -31,7 +33,7 @@ public class CTOverdriveProjector extends OverdriveProjector {
             Lines.circle(x,y,realRange * progress);
 
             Draw.reset();
-            Lines.stroke(1);
+            Lines.stroke(0.5f,C("ffffff").a(0.6f));
             Lines.circle(x,y,realRange);
         }
     }

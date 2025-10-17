@@ -20,7 +20,7 @@ import arc.util.Nullable;
 import arc.util.pooling.Pools;
 import mindustry.gen.Tex;
 import mindustry.ui.Fonts;
-
+//BOSS血条
 public class BossBar extends Element {
     private static final Rect scissor = new Rect();
 

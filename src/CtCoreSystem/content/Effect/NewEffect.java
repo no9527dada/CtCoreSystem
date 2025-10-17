@@ -6,6 +6,9 @@ import mindustry.entities.effect.ParticleEffect;
 import mindustry.entities.effect.WaveEffect;
 
 public class NewEffect {
+
+
+
     public static class BulletParticleEffect extends ParticleEffect {
         public BulletParticleEffect() {
             region = "circle";

@@ -1,9 +1,9 @@
 package CtCoreSystem.content;
 
 import CtCoreSystem.CoreSystem.type.*;
+import CtCoreSystem.CoreSystem.type.LYBF.SuperForceProjectorLYBF;
 import CtCoreSystem.CoreSystem.type.Ovulam5480.BulletType.RoundBulletType;
 import CtCoreSystem.CoreSystem.type.Ovulam5480.BulletType.percentBulletType;
-import CtCoreSystem.CoreSystem.type.LYBF.SuperForceProjectorLYBF;
 import CtCoreSystem.CoreSystem.type.Ovulam5480.ReclamationBlock;
 import CtCoreSystem.CoreSystem.type.Ovulam5480.液体分发器;
 import CtCoreSystem.CoreSystem.type.Ovulam5480.物资分发器;
@@ -61,13 +61,12 @@ import static mindustry.world.meta.BlockGroup.liquids;
 import static mindustry.world.meta.BlockGroup.transportation;
 
 public class SourceCodeModification_Sandbox {
-    private static  Color THE_COLOR = Color.purple;
-    public static Block 隐形核心,结束波次更改,Buff加盾,Buff加血,Buff速度,Buff射击速度,
-            Buff伤害,游戏速度,游戏缩放,
-    游戏环境光开关,核心禁造圈,资源清空开关,敌人出生点范围,拆除返还资源倍率,地图炸档器,
-    沙盒全能物品源,无敌核心,沙盒无敌墙,无限电,物品原,液体源,
-    物资分发器,物资提取器,液体分发器,世界仓库,电力力场网,无敌虚无,无限电力的电池,填海器;
-
+    public static Block 隐形核心, 结束波次更改, Buff加盾, Buff加血, Buff速度, Buff射击速度,
+            Buff伤害, 游戏速度, 游戏缩放,
+            游戏环境光开关, 核心禁造圈, 资源清空开关, 敌人出生点范围, 拆除返还资源倍率, 地图炸档器, 无限火力开关,
+            沙盒全能物品源, 无敌核心, 沙盒无敌墙, 无限电, 物品原, 液体源,
+            物资分发器, 物资提取器, 液体分发器, 世界仓库, 电力力场网, 无敌虚无, 无限电力的电池, 填海器;
+    private static Color THE_COLOR = Color.purple;
 
     public static void load() {
         //敌人的隐形核心，作用于刷怪，不可被攻击和摧毁，只能用逻辑清除该方块，达到胜利的目的
@@ -107,21 +106,24 @@ public class SourceCodeModification_Sandbox {
         Blocks.  liquidSource.envDisabled = Evn2.标志1 | Env.terrestrial;
         Blocks.    liquidVoid.envDisabled = Evn2.标志1 | Env.terrestrial;*/
 
-        结束波次更改 =new waveRule("waveRule");
-        Buff加盾 =new TDBuffChange.Buff加盾("Shield");
-        Buff加血=new TDBuffChange.BuffHealth("Health");
-        Buff速度=new TDBuffChange.BuffSpee("Speed");
-        Buff射击速度=new TDBuffChange.BuffReload("Reload");
-        Buff伤害=new TDBuffChange.BuffDmage("Damage");
-        游戏速度=new TDBuffChange.游戏速度("游戏速度");
-        游戏缩放=new TDBuffChange.游戏缩放("游戏缩放");
-        游戏环境光开关=new TDBuffChange.游戏环境光开关("游戏环境光开关");
-        核心禁造圈=new TDBuffChange.核心禁造圈("核心禁造半径");
-        资源清空开关=new TDBuffChange.资源清空开关("资源清空开关");
-        敌人出生点范围=new TDBuffChange.敌人出生点范围("敌人出生点范围");
-        拆除返还资源倍率=new TDBuffChange.拆除返还资源倍率("拆除返还资源倍率");
+        结束波次更改 = new waveRule("waveRule");
+        Buff加盾 = new TDBuffChange.Buff加盾("Shield");
+        Buff加血 = new TDBuffChange.BuffHealth("Health");
+        Buff速度 = new TDBuffChange.BuffSpee("Speed");
+        Buff射击速度 = new TDBuffChange.BuffReload("Reload");
+        Buff伤害 = new TDBuffChange.BuffDmage("Damage");
+        游戏速度 = new TDBuffChange.游戏速度("游戏速度");
+        游戏缩放 = new TDBuffChange.游戏缩放("游戏缩放");
+        游戏环境光开关 = new TDBuffChange.游戏环境光开关("游戏环境光开关");
+        核心禁造圈 = new TDBuffChange.核心禁造圈("核心禁造半径");
+        资源清空开关 = new TDBuffChange.资源清空开关("资源清空开关");
+        敌人出生点范围 = new TDBuffChange.敌人出生点范围("敌人出生点范围");
+        拆除返还资源倍率 = new TDBuffChange.拆除返还资源倍率("拆除返还资源倍率");
+        无限火力开关 = new TDBuffChange.无限火力开关("无限火力开关");
+
         //地图炸档器
-        地图炸档器=new BufferedItemBridge("breakdown") {
+        //没效果  待修
+        地图炸档器 = new BufferedItemBridge("breakdown") {
             {
                 requirements(Category.effect, BuildVisibility.editorOnly, with(物品, 1));
                 health = 100;
@@ -155,7 +157,7 @@ public class SourceCodeModification_Sandbox {
             }
         };
         //沙盒全能物品源
-        沙盒全能物品源=new XVXSource("Automatic-adaptation-source") {
+        沙盒全能物品源 = new XVXSource("Automatic-adaptation-source") {
             {
                 this.requirements(Category.distribution, BuildVisibility.sandboxOnly, ItemStack.with());
                 this.alwaysUnlocked = true;
@@ -164,7 +166,7 @@ public class SourceCodeModification_Sandbox {
 
             }
         };
-        无敌核心=new CoreBlock("invincibleCore") {
+        无敌核心 = new CoreBlock("invincibleCore") {
             float powerProduction;
 
             {
@@ -262,7 +264,6 @@ public class SourceCodeModification_Sandbox {
                 outputsPower = true;
 
             }
-
 
 
             //用于发电显示
@@ -403,7 +404,7 @@ public class SourceCodeModification_Sandbox {
                 lifetime = 70f;
                 absorbable = false;//子弹不被护盾仪吸收
                 ammoMultiplier = 1;
-                trailColor =THE_COLOR;
+                trailColor = THE_COLOR;
                 trailParam = 5;
                 trailLength = 8;
                 trailWidth = 5;
@@ -430,14 +431,14 @@ public class SourceCodeModification_Sandbox {
                 fragBullet = new BasicBulletType(9f, 999999) {
                     {
                         hitEffect = new Effect(8, (e) -> {
-                                Draw.color(Color.black, THE_COLOR, e.fin());
-                        Lines.stroke(0.5f + e.fout());
-                        Lines.circle(e.x, e.y, e.fin() * 10);
-                    });
+                            Draw.color(Color.black, THE_COLOR, e.fin());
+                            Lines.stroke(0.5f + e.fout());
+                            Lines.circle(e.x, e.y, e.fin() * 10);
+                        });
                         despawnEffect = new Effect(8, (e) -> {
-                                Draw.color(Color.black, THE_COLOR, e.fin());
-                        Lines.stroke(0.5f + e.fout());
-                        Lines.circle(e.x, e.y, e.fin() * 5);
+                            Draw.color(Color.black, THE_COLOR, e.fin());
+                            Lines.stroke(0.5f + e.fout());
+                            Lines.circle(e.x, e.y, e.fin() * 5);
                         });
                     }
 
@@ -531,12 +532,14 @@ public class SourceCodeModification_Sandbox {
                             unit.remove();
                         }
                     }
+
                     public void draw(Bullet b) {
                         Draw.color(THE_COLOR);
                         Drawf.tri(b.x, b.y, 4, 8, b.rotation());
                         Drawf.tri(b.x, b.y, 4, 12, b.rotation() - 180);
                         Draw.reset();
                     }
+
                     {
                         absorbable = false;//子弹不被护盾仪吸收
                         width = 9f;
@@ -580,7 +583,7 @@ public class SourceCodeModification_Sandbox {
             }
         };
         //沙盒无敌墙
-        沙盒无敌墙= new Wall("SandboxWall") {
+        沙盒无敌墙 = new Wall("SandboxWall") {
             {
                 localizedName = Core.bundle.get("Wall.SandboxWall");
                 description = Core.bundle.getOrNull("Wall.description.SandboxWall");
@@ -602,7 +605,7 @@ public class SourceCodeModification_Sandbox {
                 }
             }
         };
-        无限电=new PowerSource("power-source") {
+        无限电 = new PowerSource("power-source") {
             {
                 requirements(Category.power, BuildVisibility.sandboxOnly, with(物品, 0));
                 powerProduction = 9000000f / 60f;
@@ -612,7 +615,7 @@ public class SourceCodeModification_Sandbox {
                 envEnabled = Env.any;
             }
         };
-        无限电力的电池=new InfinitePowerSource("infinite-battery") {
+        无限电力的电池 = new InfinitePowerSource("infinite-battery") {
             {
                 requirements(Category.power, BuildVisibility.sandboxOnly, with(物品, 0));
                 alwaysUnlocked = true;
@@ -626,7 +629,7 @@ public class SourceCodeModification_Sandbox {
                 envEnabled = Env.any;
             }
         };
-        物品原=new ItemSource("item-source") {
+        物品原 = new ItemSource("item-source") {
             {
                 requirements(Category.distribution, BuildVisibility.sandboxOnly, with(物品, 0));
                 alwaysUnlocked = true;
@@ -640,9 +643,9 @@ public class SourceCodeModification_Sandbox {
                 alwaysUnlocked = true;
                 envEnabled = Env.any;
             }
-        }        ;
+        };
 
-        液体源=new LiquidSource("liquid-source") {
+        液体源 = new LiquidSource("liquid-source") {
             {
                 requirements(Category.liquid, BuildVisibility.sandboxOnly, with(物品, 0));
                 alwaysUnlocked = true;
@@ -656,6 +659,7 @@ public class SourceCodeModification_Sandbox {
                 envEnabled = Env.any;
             }
         };
+
         new PayloadSource("payload-source") {
             {
                 requirements(Category.units, BuildVisibility.sandboxOnly, with(物品, 0));
@@ -672,7 +676,7 @@ public class SourceCodeModification_Sandbox {
                 envEnabled = Env.any;
             }
         };
-        物资分发器=new 物资分发器("物资分发器") {{
+        物资分发器 = new 物资分发器("物资分发器") {{
             description = "";
             consumePower(1000 / 60f);
             size = 4;
@@ -683,7 +687,7 @@ public class SourceCodeModification_Sandbox {
 
             ));
         }};
-        物资提取器= new 物资提取器("物资提取器") {{
+        物资提取器 = new 物资提取器("物资提取器") {{
             description = "";
             consumePower(1000 / 60f);
             size = 4;
@@ -694,7 +698,7 @@ public class SourceCodeModification_Sandbox {
 
             ));
         }};
-        液体分发器= new 液体分发器("液体分发器") {{
+        液体分发器 = new 液体分发器("液体分发器") {{
             description = "";
             consumePower(1000 / 60f);
             size = 4;
@@ -761,39 +765,46 @@ public class SourceCodeModification_Sandbox {
             range = 50 * 8;
 
         }};
-        世界仓库= new StorageBlock("世界仓库") {{
-            description = "";
-            size = 2;
-            health = 200;
-            envEnabled = Env.any;
-            itemCapacity = 20000000;
-            requirements(Category.crafting, BuildVisibility.sandboxOnly, with(物品, 1));
-            canOverdrive = false;
-            targetable = false;
-            forceDark = true;
-            privileged = true;
-        }
+        世界仓库 = new StorageBlock("世界仓库") {
+            {
+                description = "";
+                size = 2;
+                health = 200;
+                envEnabled = Env.any;
+                itemCapacity = 20000000;
+                requirements(Category.crafting, BuildVisibility.sandboxOnly, with(物品, 1));
+                canOverdrive = false;
+                targetable = false;
+                forceDark = true;
+                privileged = true;
+            }
+
             @Override
             public boolean canBreak(Tile tile) {
-                return Vars.state.rules.infiniteResources||!privileged || state.rules.editor || state.playtestingMap != null;
-            }};
-        电力力场网=new PowerNetTower("电力力场网") {{
-            requirements(Category.power, BuildVisibility.sandboxOnly, with(物品, 1));
-            size = 3;
-            range = 90;
-            consumePowerBuffered(50000000);
-            buildType = Build::new;
-            envEnabled = Env.any;
-        }
+                return Vars.state.rules.infiniteResources || !privileged || state.rules.editor || state.playtestingMap != null;
+            }
+        };
+        电力力场网 = new PowerNetTower("电力力场网") {
+            {
+                requirements(Category.power, BuildVisibility.sandboxOnly, with(物品, 1));
+                size = 3;
+                range = 90;
+                consumePowerBuffered(50000000);
+                buildType = Build::new;
+                envEnabled = Env.any;
+            }
+
             public class Build extends PowerNetTowerBuild {
                 private static final float INFINITE_POWER = Float.MAX_VALUE / 1000f;
+
                 @Override
                 public float getPowerProduction() {
                     // 返回一个极大的数值模拟无限供电
                     return INFINITE_POWER;
                 }
-            }};
-       无敌虚无= new SuperForceProjectorLYBF("superforceprojector") {
+            }
+        };
+        无敌虚无 = new SuperForceProjectorLYBF("superforceprojector") {
             {
                 requirements(Category.crafting, BuildVisibility.sandboxOnly, with(物品, 1));
                 health = 114514;
@@ -801,11 +812,11 @@ public class SourceCodeModification_Sandbox {
                 envEnabled = Env.any;
             }
         };
-      填海器 =new ReclamationBlock("填海器"){{
- requirements(Category.crafting, BuildVisibility.sandboxOnly, with(物品, 1));
-          envEnabled = Env.any;
-          targetSize=8;
-      }};
+        填海器 = new ReclamationBlock("填海器") {{
+            requirements(Category.crafting, BuildVisibility.sandboxOnly, with(物品, 1));
+            envEnabled = Env.any;
+            targetSize = 8;
+        }};
     }
 
 

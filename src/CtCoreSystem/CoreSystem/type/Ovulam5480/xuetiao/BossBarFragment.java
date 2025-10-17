@@ -14,7 +14,7 @@ import mindustry.Vars;
 import mindustry.game.EventType;
 import mindustry.gen.Groups;
 import mindustry.gen.Unit;
-
+//BOSS血条
 public class BossBarFragment {
     private final int time = 60;
     private float timer;

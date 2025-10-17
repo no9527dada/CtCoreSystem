@@ -18,6 +18,7 @@ import mindustry.ui.dialogs.BaseDialog;
 
 import java.util.Objects;
 
+import static CtCoreSystem.CtCoreSystem.toText;
 import static CtCoreSystem.CtURL.QQ群2;
 import static CtCoreSystem.CtURL.网盘;
 import static arc.Core.settings;
@@ -30,9 +31,7 @@ public class ctUpdateDialog {
     private static BaseDialog contentDialog;
 
 
-    public static String toText(String str) {
-        return Core.bundle.format(str);
-    }
+
 
     //mod的name
     private static final String[] modNames = {

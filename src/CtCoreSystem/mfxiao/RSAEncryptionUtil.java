@@ -1,5 +1,6 @@
 package CtCoreSystem.mfxiao;
 
+import arc.Core;
 import arc.util.Log;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,6 +17,11 @@ import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.util.Base64;
 import java.util.Map;
+
+
+import static CtCoreSystem.CtCoreSystem.PopUpWindow;
+import static CtCoreSystem.CtCoreSystem.PopUpWindow2;
+import static CtCoreSystem.mfxiao.ActivateProgram.showActivationDialog;
 
 public class RSAEncryptionUtil {
 
@@ -110,11 +116,22 @@ public class RSAEncryptionUtil {
             /* 步骤 3：比对反查到的玩家名称 与 调用方传进来的 playerName */
             boolean isValid = registeredPlayerName.equals(playerName);
             if (!isValid) {
-                Log.warn("许可证检查失败：玩家名称不匹配。预期 @，实际 @", registeredPlayerName, playerName);
+               // Log.warn("许可证检查失败：玩家名称不匹配。预期 @，实际 @", registeredPlayerName, playerName);
+                Log.warn("许可证检查失败：注册名称不存在。");
+                PopUpWindow("", cont -> {
+                    cont.add(Core.bundle.format("activation.error.noUserName"));
+                });
+                ActivateProgram.isActivated = false;
             }
-            return isValid; // 只有全部通过才返回 true
+            return isValid ; // 只有全部通过才返回 true
         } catch (Exception e) {
             Log.err("许可证验证过程中发生异常", e);
+            ActivateProgram.isActivated = false;
+            showActivationDialog("@activation.error.invalidkey");
+            PopUpWindow2("", cont -> {
+                cont.add(Core.bundle.format("activation.error.localfileinvalid")).row();
+            });
+
             return false;
         }
     }

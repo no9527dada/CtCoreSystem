@@ -34,6 +34,22 @@ import static mindustry.entities.part.DrawPart.PartProgress.reload;
 import static mindustry.entities.part.DrawPart.PartProgress.warmup;
 
 public class NewFx {
+
+        /*
+Lines.circle(float x, float y, float radius) - 绘制一个普通的空心圆圈
+Fill.circle(float x, float y, float radius) - 绘制一个填充的圆圈
+ Lines.stroke(1.5f); // 设置线条绘制时的宽度
+ Draw.alpha(1f);//设置透明度
+ Lines.lineAngle(x, y, angle, length); // 绘制一条从(x, y)开始，角度为angle，长度为length的线
+ Lines.stroke(1.5f); // 设置线条绘制时的宽度
+ Lines.line(x1, y1, x2, y2); // 绘制一条从(x1, y1)到(x2, y2)的线
+
+Lines.rect(float x, float y, float width, float height, float rotation) - 绘制一个普通的空心矩形
+Fill.rect(float x, float y, float width, float height, float rotation) - 绘制一个填充的矩形
+ Draw.rect(x, y, width, height, rotation); // 绘制一个有贴图的效果
+    */
+
+
     public static int 数量 = 6;
     public static float 特效粒子的范围 = 120f;
     public static float 特效粒子外径 = 120;

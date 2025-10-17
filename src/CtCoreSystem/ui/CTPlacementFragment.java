@@ -263,9 +263,16 @@ public class CTPlacementFragment extends PlacementFragment {
                 var build = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
                 Block hovering = build == null ? null : build instanceof ConstructBuild c ? c.current : build.block;
                 Block displayBlock = menuHoverBlock != null ? menuHoverBlock : input.block != null ? input.block : hovering;
+                // 添加额外检查，确保显示方块信息时不会导致空指针异常
                 if(displayBlock != null && displayBlock.unlockedNow()){
-                    ui.content.show(displayBlock);
-                    Events.fire(new BlockInfoEvent());
+                    try {
+                        ui.content.show(displayBlock);
+                        Events.fire(new BlockInfoEvent());
+                    } catch (NullPointerException e) {
+                        // 捕获并处理UnitAssembler可能导致的空指针异常
+                        // 可以选择记录日志或者显示友好的错误信息
+                        Log.err("NullPointerException while showing block info: " + e.getMessage());
+                    }
                 }
             }
         }

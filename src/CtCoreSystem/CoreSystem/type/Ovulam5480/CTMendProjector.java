@@ -17,6 +17,7 @@ import static mindustry.Vars.indexer;
 import static mindustry.Vars.tilesize;
 
 /**
+ *
  * 非百分比的数值修复器
  */
 public class CTMendProjector extends CTMendProjector2 {
@@ -29,6 +30,7 @@ public class CTMendProjector extends CTMendProjector2 {
         reload = 5 * 60;//5秒1次加血
         healAmount = 100f;//修复的数值
         phaseRangeBoost=3*8;//是加入（相织布）提升的范围
+
     }
     public class CTMendBuild extends MendBuild {
         @Override

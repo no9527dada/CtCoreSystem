@@ -4,11 +4,17 @@ import arc.math.Mathf;
 import arc.math.geom.Intersector;
 import arc.math.geom.Vec2;
 import arc.struct.Seq;
+import arc.util.Log;
 import mindustry.Vars;
 import mindustry.entities.bullet.BulletType;
 import mindustry.entities.bullet.LightningBulletType;
 import mindustry.gen.Groups;
 import mindustry.world.blocks.defense.ForceProjector;
+import mindustry.world.consumers.Consume;
+import mindustry.world.consumers.ConsumeItems;
+import mindustry.world.meta.Stat;
+import mindustry.world.meta.StatUnit;
+import mindustry.world.meta.StatValues;
 
 //雷劫仪
 public class IightningForceProjector extends ForceProjector {
@@ -16,17 +22,39 @@ public class IightningForceProjector extends ForceProjector {
     public float 间隔Time = 30f;
     //劈里啪啦总时间, 不要超过间隔时间
     public float bilibiliTime = 20f;
+    public float 伤害 ;
     //产生的子弹
-    public BulletType bullet = new LightningBulletType() {{
-        damage = 7f;
-        lightningLength = 6;
-    }};
+    public BulletType bullet ;
 
-    public IightningForceProjector(String name) {
+    public IightningForceProjector(String name, float damage) {
         super(name);
         radius = 30 * 8;
+        伤害 = damage;
+        hasLiquids=false;
+        itemConsumer = new ConsumeItems() {{
+            //items = new Seq<>();
+        }};
+        bullet = new LightningBulletType() {{
+            damage = 伤害;
+            lightningLength = 6;
+        }};
     }
+    public void setStats() {
 
+        super.setStats();
+
+                this.stats.remove(Stat.booster);
+                stats.remove(Stat.booster);
+                stats.remove( Stat.shieldHealth);
+                stats.remove( Stat.cooldownTime);
+                stats.remove( Stat.liquidCapacity);
+                stats.remove( Stat.itemCapacity);
+                stats.add(Stat.range,this.radius/8);
+            //添加一个伤害显示
+                 stats.add(Stat.damage, 伤害);
+
+
+    }
     public class IightningForceProjectorBuilding extends ForceBuild {
         public float 间隔Timer;
         public float bilibiliTimer, preTime;

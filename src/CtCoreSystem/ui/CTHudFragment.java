@@ -1,4 +1,5 @@
 package CtCoreSystem.ui;
+import CtCoreSystem.ui.Ovulam5480.资源顶部显示;
 import arc.*;
 import arc.func.*;
 import arc.graphics.*;
@@ -39,7 +40,7 @@ public class CTHudFragment{
     private static final float dsize = 65f, pauseHeight = 36f;
 
     public PlacementFragment blockfrag = new CTPlacementFragment();
-    public CoreItemsDisplay coreItems = new CoreItemsDisplay();
+    public CoreItemsDisplay coreItems = new 资源顶部显示();
     public boolean shown = true;
 
     private ImageButton flip;

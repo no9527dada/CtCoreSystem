@@ -19,6 +19,8 @@ public class 资源顶部显示 extends CoreItemsDisplay {
     private final float timeDelta = 30f;
     public ItemModule lastItems = new ItemModule();
     public Interval interval = new Interval();
+    // 每行多少个
+    float columns = 10;
 
     public 资源顶部显示(){
         rebuild();
@@ -69,7 +71,7 @@ public class 资源顶部显示 extends CoreItemsDisplay {
                     return color + (core == null ? "0" : UI.formatAmount(ci));
                 }).padRight(3).minWidth(52f).left().tooltip(t -> t.background(Styles.black6).margin(4f).label(() -> core == null ? "0" : core.items.get(item) + "").style(Styles.outlineLabel));
 
-                if(++i % 10 == 0){
+                if(++i % columns == 0){
                     row();
                 }
             }

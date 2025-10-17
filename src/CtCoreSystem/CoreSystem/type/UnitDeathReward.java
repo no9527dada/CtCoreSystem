@@ -1,16 +1,22 @@
 package CtCoreSystem.CoreSystem.type;
 
+import arc.Core;
 import arc.Events;
 import arc.func.Cons;
+import arc.graphics.Color;
+import arc.scene.ui.layout.Table;
 import mindustry.Vars;
 import mindustry.game.EventType;
 import mindustry.game.Team;
 import mindustry.type.ItemStack;
 import mindustry.type.UnitType;
+import mindustry.ui.Styles;
 import mindustry.world.modules.ItemModule;
 
 import java.util.HashMap;
 import java.util.Objects;
+
+import static mindustry.logic.LAccess.config;
 
 /*
  *@Author:LYBF
@@ -63,10 +69,15 @@ public class UnitDeathReward {
         return instance;
     }
 
+
+
     Cons<EventType.UnitDestroyEvent> cons = (EventType.UnitDestroyEvent e) -> {
         Team unitTeam = e.unit.team;
         Team playerTeam = Vars.player.team();
         //是同一个队伍时不触发
+        // 判断条件：
+        // 1. 死亡单位不是玩家团队的单位
+        // 2. 玩家团队拥有核心建筑（基地）
         if (unitTeam == playerTeam || Vars.state.teams.get(Vars.player.team()).core() == null) return;
         UnitDeathRewardConfiguration configuration = configurations.get(e.unit.type.name);
         if (!Objects.isNull(configuration)) {

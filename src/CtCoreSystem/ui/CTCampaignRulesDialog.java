@@ -1,6 +1,6 @@
 package CtCoreSystem.ui;
 
-import CtCoreSystem.ui.dialogs.SettingDifficultyDialog;
+import CtCoreSystem.ui.NanDu.SettingDifficultyDialog;
 import arc.Core;
 import arc.func.Boolc;
 import arc.func.Boolp;
