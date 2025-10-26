@@ -1,7 +1,7 @@
 package CtCoreSystem.ui.dialogs;
 //区块名显示
 
-import CtCoreSystem.ui.NanDu.CampaignRulesDialog;
+import CtCoreSystem.ui.NanDu.CTCampaignRulesDialog;
 import arc.Core;
 import arc.func.Cons;
 import arc.graphics.Color;
@@ -32,7 +32,7 @@ import static mindustry.ui.dialogs.PlanetDialog.Mode.planetLaunch;
 import static mindustry.ui.dialogs.PlanetDialog.Mode.select;
 
 public class CT3PlanetDialog extends PlanetDialog {
-    private CampaignRulesDialog campaignRules = new CampaignRulesDialog();
+    private CTCampaignRulesDialog campaignRules = new CTCampaignRulesDialog();
 
     public static float arcDrawText(String text, float scl, float dx, float dy, int halign) {
         Font font = Fonts.outline;

@@ -7,6 +7,7 @@ import arc.scene.ui.Label;
 import arc.scene.ui.TextButton;
 import arc.scene.ui.layout.Cell;
 import arc.util.Align;
+import arc.util.Log;
 import mindustry.ui.dialogs.BaseDialog;
 import mindustry.ui.dialogs.SettingsMenuDialog;
 
@@ -38,6 +39,7 @@ public class 激活进入 {
                 };
                 st.checkPref("主动关闭激活", false, e -> {
                     主动关闭激活 = !主动关闭激活;
+                    Core.settings.put("主动关闭激活", 主动关闭激活);
                     showCustomDialog("", cont -> {
                         cont.margin(15);
                     });
@@ -50,7 +52,7 @@ public class 激活进入 {
 
                 cont.add("您已经激活，无需重复激活").center().growX().wrap().width(620).maxWidth(620).pad(4).labelAlign(Align.center).row();
                 cont.add(st);
-
+                Log.info("主动关闭激活 " + 主动关闭激活);
 
             }
         }};

@@ -15,7 +15,7 @@ public class WorldDifficulty {
     public static StatusEffect cheat;
 
     public static void init() {
-        //if (cheat == null) {
+        if (cheat == null) {
             cheat = new StatusEffect("difficulty") {
                 {show = true;
                     localizedName = "难度模式";
@@ -29,7 +29,7 @@ public class WorldDifficulty {
                     uiIcon = Core.atlas.find("ctcoresystem-difficulty");
                 }
             };
-       // }
+       }
 
         Events.run(EventType.Trigger.update, () -> {
             if (!Vars.ui.editor.isShown() && !Vars.state.rules.editor && !Vars.state.isMenu()) {

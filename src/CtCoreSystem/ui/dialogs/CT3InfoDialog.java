@@ -52,11 +52,11 @@ public class CT3InfoDialog {
                 table.image(Core.atlas.find("ctcoresystem-CT-logo", Core.atlas.find("clear"))).height(290).width(587).pad(3).row();
                 }else {
                     table.image(Core.atlas.find("ctcoresystem-CT2-logo", Core.atlas.find("clear"))).height(290).width(587).pad(3).row();
-                    table.button("起源额外内容激活", () -> {
+                   /* table.button("起源额外内容激活", () -> {
 
                         激活进入.show();
 
-                    }).size(280, 64).left().row();
+                    }).size(280, 64).left().row();*/
                 }
 
                 table.add("更新内容:").left().growX().wrap().width(620).maxWidth(620).pad(4).labelAlign(Align.left);

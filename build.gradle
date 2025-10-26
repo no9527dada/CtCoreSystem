@@ -34,6 +34,8 @@ allprojects{
 }
 
 dependencies{
+   //implementation 'com.fasterxml.jackson.core:jackson-core:2.9.0'
+   //implementation 'com.fasterxml.jackson.databind:jackson-databind:2.9.0'
     implementation 'org.jetbrains:annotations:20.1.0'
     compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
     compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
@@ -77,7 +79,7 @@ jar{
     archiveFileName = "${base.archivesBaseName}Desktop.jar"
 
     from{
-        configurations.runtimeClasspath.collect{ it.isDirectory() ? it : zipTree(it) }
+       configurations.runtimeClasspath.collect{ it.isDirectory() ? it : zipTree(it) }
     }
 
     from(rootDir){

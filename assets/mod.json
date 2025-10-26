@@ -3,7 +3,7 @@
   "displayName": "创世神核心加载系统前置",
   "author": "9527",
   "description": "Creators Core System",
-  "version": "1.37",
+  "version": "1.38",
   "minGameVersion": 150,
   "main": "CtCoreSystem.CtCoreSystem",
  // "main": "ccdd.ccdd",

@@ -15,8 +15,7 @@ import mindustry.ui.dialogs.BaseDialog;
 import java.util.Base64;
 import java.nio.charset.StandardCharsets;
 
-import static CtCoreSystem.CtCoreSystem.showCustomDialog;
-import static CtCoreSystem.CtCoreSystem.主动关闭激活;
+import static CtCoreSystem.CtCoreSystem.*;
 import static CtCoreSystem.CtURL.爱发电;
 import static CtCoreSystem.CtURL.赞助QQ群;
 
@@ -94,6 +93,9 @@ public class ActivateProgram {
                 isActivated = false;
                 主动关闭激活 = false;
                 saveActivationState();
+              PopUpWindow2("", cont -> {
+                    cont.add(Core.bundle.format("activation.error.localfileinvalid")).row();
+                });
             }
         } else {
             Log.info("许可证文件存在但内容为空");

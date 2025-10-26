@@ -1,5 +1,6 @@
 package CtCoreSystem.ui.NanDu;
 
+import CtCoreSystem.mfxiao.ActivateProgram;
 import arc.Core;
 import arc.Events;
 import mindustry.Vars;
@@ -8,9 +9,9 @@ import mindustry.gen.Groups;
 import mindustry.gen.Unit;
 import mindustry.type.StatusEffect;
 
-//未激活 普通版CT2难度
 
-public class WorldDifficultyCT2 {
+//已激活 激活版CT2难度
+public class WorldDifficultyCT2Vip {
     // public DifficultyConfigure 配置项 = new DifficultyConfigure();
     public static StatusEffect 作弊系统;
 
@@ -38,7 +39,7 @@ public class WorldDifficultyCT2 {
                 保存默认难度(MapName);
                 设置难度(MapName);
 
-                Groups.unit.each(WorldDifficultyCT2::UnitDraw);
+                Groups.unit.each(WorldDifficultyCT2Vip::UnitDraw);
             }
         });
     }
@@ -53,8 +54,8 @@ public class WorldDifficultyCT2 {
         var keyB = Vars.state.rules.waveTeam;
 
         var key1 = Vars.state.rules.teams.get(keyB).unitDamageMultiplier;
-        var key2 = Vars.state.rules.buildCostMultiplier;
-        //   var key3 =  Vars.state.rules.teams.get( Vars.state.rules.waveTeam).unitBuildSpeedMultiplier;
+      var key2 =  Vars.state.rules.buildCostMultiplier;
+     //   var key3 =  Vars.state.rules.teams.get( Vars.state.rules.waveTeam).unitBuildSpeedMultiplier;
         //var key4 = Vars.state.rules.teams.get(keyB).blockDamageMultiplier;
 
         setWorldMap(MapName, "地图敌人单位攻击", key1);
@@ -77,7 +78,7 @@ public class WorldDifficultyCT2 {
 
         Vars.state.rules.teams.get(keyB).unitDamageMultiplier = key1 * 单位攻击倍率(Core.settings.getInt("游戏难度"));
         Vars.state.rules.buildCostMultiplier = key2 * 建造资源倍率(Core.settings.getInt("游戏难度"));
-        Vars.state.getPlanet().campaignRules.difficulty.enemySpawnMultiplier = 1 * 敌人数量倍率(Core.settings.getInt("游戏难度"));
+        Vars. state.getPlanet().campaignRules.difficulty.enemySpawnMultiplier =  1*敌人数量倍率(Core.settings.getInt("游戏难度"));
 
         //Vars.state.rules.teams.get(keyB).blockDamageMultiplier = key3 *建筑攻击倍率(Core.settings.getInt("游戏难度"));
     }
@@ -108,126 +109,115 @@ public class WorldDifficultyCT2 {
 
     public static float 敌人数量倍率(int 值) {
 
-        switch (值) {
-            case 1, 2, 3, 4, 5, 6:
-                return 1f;
+            switch (值) {
+                case 1:
+                    return 1;
+                case 2:
+                    return 1f;
+                case 3:
+                    return 1.4f;
+                case 4:
+                    return 1.8f;
+            }
 
-        }
         return 1f;
     }
-
     public static float 建造资源倍率(int 值) {
 
-        switch (值) {
-            case 1:
-                return 1f;
-            case 2:
-                return 1;
-            case 3:
-                return 1f;
-            case 4:
-                return 1;
-            case 5:
-                return 1f;
-            case 6:
-                return 0.7f;
-        }
+            switch (值) {
+
+                case 14:
+                    return 1;
+                case 2:
+                    return 1f;
+                case 3:
+                    return 1.2f;
+                case 4:
+                    return 1.4f;
+            }
+
         return 1f;
     }
-
     public static float 时间倍率(int 值) {
 
-        switch (值) {
-            case 1:
-                return 1f;
-            case 2:
-                return 2;
-            case 3:
-                return 1.5f;
-            case 4:
-                return 1;
-            case 5:
-                return 0.8f;
-            case 6:
-                return 1.5f;
+            switch (值) {
 
-        }
+                case 1:
+                    return 1;
+                case 2:
+                    return 0.8f;
+                case 3:
+                    return 1.0f;
+                case 4:
+                    return 1.2f;
+            }
+
         return 1f;
     }
 
     public static float 单位血量倍率(int 值) {
 
-        switch (值) {
-            case 1:
-                return 0.01f;
-            case 2:
-                return 0.3f;
-            case 3:
-                return 0.7f;
-            case 4:
-                return 1;
-            case 5:
-                return 1.8f;
-            case 6:
-                return 2.5f;
-        }
+            switch (值) {
+
+                case 1:
+                    return 1.4f;
+                case 2:
+                    return 1.8f;
+                case 3:
+                    return 2.5f;
+                case 4:
+                    return 3.8f;
+            }
+
         return 1f;
     }
 
     public static float 单位攻击倍率(int 值) {
 
-        switch (值) {
-            case 1:
-                return 0.0001f;
-            case 2:
-                return 0.5f;
-            case 3:
-                return 0.75f;
-            case 4:
-                return 1;
-            case 5:
-                return 1.15f;
-            case 6:
-                return 1.5f;
-        }
+            switch (值) {
+
+                case 1:
+                    return 1;
+                case 2:
+                    return 1.1f;
+                case 3:
+                    return 1.5f;
+                case 4:
+                    return 1.7f;
+            }
+
         return 1f;
     }
 
     public static float 单位射速倍率(int 值) {
 
-        switch (值) {
-            case 1:
-                return 0f;
-            case 2:
-                return 0.6f;
-            case 3:
-                return 0.8f;
-            case 4:
-                return 1;
-            case 5:
-                return 1.5f;
-            case 6:
-                return 1.8f;
-        }
+            switch (值) {
+                case 1:
+                    return 1;
+                case 2:
+                    return 1.2f;
+                case 3:
+                    return 1.5f;
+                case 4:
+                    return 1.8f;
+            }
+
         return 1f;
     }
 
     public static float 单位移动倍率(int 值) {
 
-        switch (值) {
-            case 1:
-                return 1f;
-            case 2:
-                return 0.8f;
-            case 3:
-                return 0.9f;
-            case 4:
-                return 1f;
-            case 5:
-                return 1f;
-            case 6:
-                return 0.8f;
-        }
+            switch (值) {
+                case 1:
+                    return 1f;
+                case 2:
+                    return 1.2f;
+                case 3:
+                    return 1.2f;
+                case 4:
+                    return 1.3f;
+            }
+
         return 1f;
     }
 

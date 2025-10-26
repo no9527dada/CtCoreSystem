@@ -205,7 +205,7 @@ public class TDBuffChange {
         }
         @Override
         public boolean canBreak(Tile tile) {
-            return Vars.state.rules.infiniteResources||!privileged || state.rules.editor || state.playtestingMap != null;
+            return Vars.state.rules.infiniteResources||privileged || state.rules.editor || state.playtestingMap != null;
         }
         public class 加盾Build extends Building {
             public Seq<Unit> units = new Seq<>();
@@ -540,7 +540,8 @@ public class TDBuffChange {
                     Vars.state.rules.teams.get(Team.get((int)p1)).cheat = !Mathf.zero(p2);
                 }
                 super.control(type, p1, p2, p3, p4);
-              Vars.state.rules.teams.get(Team.sharded).cheat=false;
+            //  Vars.state.rules.teams.get(Team.sharded).cheat=false;
+
             }
 
         }

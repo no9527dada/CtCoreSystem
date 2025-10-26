@@ -16,6 +16,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -58,7 +59,7 @@ public class RSAEncryptionUtil {
     /**
      * 从远程URL获取验证数据。
      */
-    private static Map<String, String> fetchValidationData() throws Exception {
+  private static Map<String, String> fetchValidationData() throws Exception {
         URL url = new URL(VALIDATION_URL);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
@@ -77,7 +78,60 @@ public class RSAEncryptionUtil {
             connection.disconnect();
         }
     }
+  /*  private static Map<String, String> fetchValidationData() throws Exception {
+        URL url = new URL(VALIDATION_URL);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.setConnectTimeout(5000);
+        connection.setReadTimeout(5000);
 
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
+            StringBuilder response = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                response.append(line);
+            }
+
+            // 使用Java标准库解析JSON
+            return parseJsonToMap(response.toString());
+        } finally {
+            connection.disconnect();
+        }
+    }
+
+    *//**
+     * 使用Java标准库解析JSON字符串为Map
+     *//*
+    private static Map<String, String> parseJsonToMap(String jsonString) {
+        Map<String, String> map = new HashMap<>();
+
+        // 简单的JSON解析实现（仅适用于简单的键值对格式）
+        jsonString = jsonString.trim();
+        if (jsonString.startsWith("{") && jsonString.endsWith("}")) {
+            jsonString = jsonString.substring(1, jsonString.length() - 1);
+
+            // 分割键值对（注意：这是一个简化实现，不处理嵌套JSON或字符串中的逗号）
+            String[] pairs = jsonString.split(",");
+            for (String pair : pairs) {
+                pair = pair.trim();
+                int colonIndex = pair.indexOf(':');
+                if (colonIndex > 0) {
+                    String key = pair.substring(0, colonIndex).trim();
+                    String value = pair.substring(colonIndex + 1).trim();
+
+                    // 去除引号
+                    if (key.startsWith("\"")) key = key.substring(1);
+                    if (key.endsWith("\"")) key = key.substring(0, key.length() - 1);
+                    if (value.startsWith("\"")) value = value.substring(1);
+                    if (value.endsWith("\"")) value = value.substring(0, value.length() - 1);
+
+                    map.put(key, value);
+                }
+            }
+        }
+
+        return map;
+    }*/
     /**
      * [MODIFIED] 方法重构，功能变为根据玩家信息从远程获取预期的订单号。
      * @param playerName 玩家名称

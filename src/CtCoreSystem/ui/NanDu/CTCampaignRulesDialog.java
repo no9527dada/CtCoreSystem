@@ -1,11 +1,12 @@
-package CtCoreSystem.ui;
+package CtCoreSystem.ui.NanDu;
 
-import CtCoreSystem.ui.NanDu.SettingDifficultyDialog;
+import CtCoreSystem.mfxiao.ActivateProgram;
 import arc.Core;
 import arc.func.Boolc;
 import arc.func.Boolp;
 import arc.scene.ui.layout.Table;
 import arc.util.Align;
+import arc.util.Log;
 import mindustry.Vars;
 import mindustry.content.Planets;
 import mindustry.game.CampaignRules;
@@ -14,6 +15,7 @@ import mindustry.gen.Tex;
 import mindustry.type.Planet;
 import mindustry.ui.dialogs.CampaignRulesDialog;
 
+import static CtCoreSystem.CtCoreSystem.主动关闭激活;
 import static CtCoreSystem.CtCoreSystem.加载CT2;
 
 public class CTCampaignRulesDialog extends CampaignRulesDialog {
@@ -49,11 +51,33 @@ public class CTCampaignRulesDialog extends CampaignRulesDialog {
             current = inner;
             current.add("原版难度已禁止修改").left().wrap().labelAlign(Align.left).center().row();
             //add("原版难度已禁止修改").left().wrap().labelAlign(Align.left).center().row();
-            current.table(Tex.button, t -> {
-                t.margin(10f);
-                t.defaults().size(180f, 50f);
-                t.button("创世神难度设置", () -> new SettingDifficultyDialog(加载CT2()).show());
-            }).left().fill(false).expand(false, false).row();
+            if (主动关闭激活==false)
+            {
+                if (ActivateProgram.isActivated == true) {//激活版难度
+                    current.table(Tex.button, t -> {
+                        t.margin(10f);
+                        t.defaults().size(180f, 50f);
+                        t.button("激活版难度设置", () -> new SettingDifficultyDialogVip(加载CT2()).show());
+                        Log.info("CT2激活难度");
+                    }).left().fill(false).expand(false, false).row();
+                } else {
+                    //普通版难度
+                    current.table(Tex.button, t -> {
+                        t.margin(10f);
+                        t.defaults().size(180f, 50f);
+                        t.button("创世神难度设置", () -> new SettingDifficultyDialog(加载CT2()).show());
+                        Log.info("CT2经典难度");
+                    }).left().fill(false).expand(false, false).row();
+                }
+            }else {
+                //普通版难度
+                current.table(Tex.button, t -> {
+                    t.margin(10f);
+                    t.defaults().size(180f, 50f);
+                    t.button("创世神难度设置", () -> new SettingDifficultyDialog(加载CT2()).show());
+                    Log.info("CT2经典难度");
+                }).left().fill(false).expand(false, false).row();
+            }
 
 
             check("@rules.fog", b -> rules.fog = b, () -> rules.fog);
