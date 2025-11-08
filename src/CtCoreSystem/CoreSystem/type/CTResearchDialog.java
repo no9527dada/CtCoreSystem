@@ -76,7 +76,7 @@ public class CTResearchDialog extends BaseDialog {
 
     public CTResearchDialog() {
         super("");
-        Log.info("创世神科科技树强化显示已加载");
+        Log.info("创世神科技树强化显示已加载");
         titleTable.remove();
         titleTable.clear();
         titleTable.top();

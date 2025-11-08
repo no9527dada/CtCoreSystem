@@ -2,6 +2,7 @@ package CtCoreSystem.ui.dialogs;
 
 import CtCoreSystem.ui.CTui;
 import arc.Core;
+import arc.Events;
 import arc.graphics.Color;
 import arc.scene.ui.ImageButton;
 import arc.scene.ui.Label;
@@ -13,6 +14,7 @@ import arc.util.Time;
 import creators.Creators;
 import mindustry.Vars;
 import mindustry.core.UI;
+import mindustry.game.EventType;
 import mindustry.game.Team;
 import mindustry.gen.Groups;
 import mindustry.gen.Icon;
@@ -24,7 +26,6 @@ import mindustry.ui.dialogs.BaseDialog;
 import static CtCoreSystem.CtCoreSystem.加载CTTD;
 import static CtCoreSystem.CtURL.QQ群2;
 import static mindustry.gen.Call.sendChatMessage;
-
 public class 游戏功能按钮 {
     // 添加单位贴图开关方法
     private int currentTeamMode = 0; // 0: none, 1: crux, 2: sharded, 3: all
@@ -50,6 +51,12 @@ public class 游戏功能按钮 {
 
             // 更新速度标签文本
             label.setText(getText(value));
+
+            // 只在联机模式下，并且是主机时发送聊天消息 防止客机刷屏
+            if (Vars.net.active() && Vars.net.server()) {
+                // 向聊天框发送消息：房主已将游戏速度调至X倍
+                sendChatMessage("[yellow]我已将游戏速度调至" + speed + "倍");
+            }
         });
 
         // 初始化滑块值为0
@@ -99,7 +106,7 @@ public class 游戏功能按钮 {
             clearAllUnitsFromDrawGroup();
 
             // 根据选择的模式显示对应队伍的单位
-            switch (currentTeamMode) {
+           switch (currentTeamMode) {
                 case 0:// all 显示全部
                     // 遍历Team.all数组中的所有队伍，而不是尝试直接获取Team.all
                     for (Team team : Team.all) {
@@ -112,12 +119,34 @@ public class 游戏功能按钮 {
                     Vars.state.teams.get(Team.sharded).units.each(unit -> Groups.draw.add(unit));
                     break;
                 case 2://显示 crux (红队)
-                    Vars.state.teams.get(Team.crux).units.each(unit -> Groups.draw.add(unit));
+                        Vars.state.teams.get(Team.crux).units.each(unit -> Groups.draw.add(unit));
                     break;
                 case 3: //全隐藏
                     break;
             }
-
+            /*switch (currentTeamMode) {
+                case 0:// all 显示全部
+                    for (Team team : Team.all) {
+                        if (team != null) { // 确保队伍不为null
+                            Vars.state.teams.get(team).units.each(unit -> Groups.draw.add(unit));
+                        }
+                    }
+                    break;
+                case 1:  //显示 sharded (黄队)
+                    Events.run(EventType.Trigger.update, () ->{Vars.state.teams.get(Team.crux).units.each(unit -> Groups.draw.remove(unit));});
+                   Vars.state.teams.get(Team.sharded).units.each(unit -> Groups.draw.add(unit));
+                    break;
+                case 2://显示 crux (红队)
+                    Events.run(EventType.Trigger.update, () ->{Vars.state.teams.get(Team.sharded).units.each(unit -> Groups.draw.remove(unit));});
+                   Vars.state.teams.get(Team.crux).units.each(unit -> Groups.draw.add(unit));
+                    break;
+                case 3: //全隐藏
+                    // 清除所有队伍的单位
+                    for (Team team : Team.all) {
+                        Events.run(EventType.Trigger.update, () ->{Vars.state.teams.get(team).units.each(unit -> Groups.draw.remove(unit));});
+                    }
+                    break;
+            }*/
             // 更新标签文本
             label.setText(getTeamModeText(currentTeamMode));
         });

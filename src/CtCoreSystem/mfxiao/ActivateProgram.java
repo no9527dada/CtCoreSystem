@@ -11,6 +11,7 @@ import arc.util.Log;
 import arc.util.Threads;
 import arc.util.Time;
 import mindustry.Vars;
+import mindustry.gen.Tex;
 import mindustry.ui.dialogs.BaseDialog;
 import java.util.Base64;
 import java.nio.charset.StandardCharsets;
@@ -73,38 +74,74 @@ public class ActivateProgram {
     }
 
     public static void startActivationProcess() {
-        // 检查本地是否存在许可证文件
-        // 移除内部对LICENSE_FILE存在性的检查，因为外部调用前已经检查过
-        // 直接获取许可证密钥进行验证
-        String licenseKey = LICENSE_FILE.readString().trim();
-        if (!licenseKey.isEmpty()) {
-            Log.info("找到本地许可证文件，正在同步验证...");
-            String playerName = Vars.player.name();
-            String playerUuid = Vars.player.uuid();
+        try {
+            // 检查本地是否存在许可证文件
 
-            boolean success = RSAEncryptionUtil.verifyLicense(playerName, playerUuid, licenseKey);
+            // 移除内部对LICENSE_FILE存在性的检查，因为外部调用前已经检查过
+            // 直接获取许可证密钥进行验证
+            String licenseKey = LICENSE_FILE.readString().trim();
+            if (!licenseKey.isEmpty()) {
+                Log.info("找到本地许可证文件，正在同步验证...");
+                String playerName = Vars.player.name();
+                String playerUuid = Vars.player.uuid();
 
-            if (success) {
-                Log.info("本地许可证验证成功！");
-                isActivated = true;
-                saveActivationState();
+                boolean success = RSAEncryptionUtil.verifyLicense(playerName, playerUuid, licenseKey);
+
+                if (success) {
+                    Log.info("本地许可证验证成功！");
+                    isActivated = true;
+                    saveActivationState();
+                } else {
+                    Log.err("本地许可证验证失败.可能原因：激活码已失效或注册名称已被封禁");
+                    isActivated = false;
+                    主动关闭激活 = false;
+                    saveActivationState();
+                    PopUpWindow2("", cont -> {
+                        cont.add(Core.bundle.format("activation.error.localfileinvalid")).row();
+                    });
+                }
             } else {
-                Log.err("本地许可证验证失败.可能原因：激活码已失效或注册名称已被封禁");
+                Log.info("许可证文件存在但内容为空");
                 isActivated = false;
                 主动关闭激活 = false;
                 saveActivationState();
-              PopUpWindow2("", cont -> {
-                    cont.add(Core.bundle.format("activation.error.localfileinvalid")).row();
-                });
             }
-        } else {
-            Log.info("许可证文件存在但内容为空");
-            isActivated = false;
-            主动关闭激活 = false;
-            saveActivationState();
+        } catch (Throwable t) {
+            // 检查是否是Jackson Core相关的类加载错误
+            if (t instanceof NoClassDefFoundError && t.getMessage() != null &&
+                    (t.getMessage().contains("com/fasterxml/jackson/core") ||
+                            t.getMessage().contains("com.fasterxml.jackson.core"))) {
+                Log.err("检测到Jackson库缺失，跳过激活验证过程");
+                isActivated = false;
+                主动关闭激活 = false;
+                saveActivationState();
+                BaseDialog dialog = new BaseDialog("警告");
+                dialog.cont.table(Tex.button, g -> {
+                    g.defaults().size(280, 160).left();
+                    g.add(Core.bundle.format("activation.error.info")).align(Align.center).row();
+                    g.button("@wait", (dialog::hide)).size(100, 64).center();//关闭按钮
+                    // 新增：添加一个重置按钮，点击后删除激活文件重置状态
+                    g.button("@delete", () -> {
+                        // 删除激活文件和许可证文件
+                        ACTIVATION_STATE_FILE.delete();
+                        LICENSE_FILE.delete();
+                        dialog.hide();
+                        PopUpWindow2("", cont -> {
+                            cont.add(Core.bundle.format("activation.error.info2")).row();
+                        },3);
+                    }).size(100, 64).center();//重置按钮
+                });
+                dialog.show();
+            } else {
+                // 处理其他类型的错误
+                Log.err("激活过程中发生错误: " + t.getMessage());
+                t.printStackTrace();
+                isActivated = false;
+                主动关闭激活 = false;
+                saveActivationState();
+            }
         }
     }
-
     /**
      * 验证许可证 (用于用户手动激活)
      *
@@ -168,7 +205,7 @@ public class ActivateProgram {
 
         // 提示信息
         dialog.cont.add(message).wrap().growX().pad(10).row();
-        dialog.cont.add("对创作者赞助后，作为对赞助者的感谢福利，我们对赞助者增加了全新战役模式。").center().growX().wrap().width(620).maxWidth(620).pad(4).labelAlign(Align.center).row();
+        dialog.cont.add(Core.bundle.format("activation.io")).center().growX().wrap().width(620).maxWidth(620).pad(4).labelAlign(Align.center).row();
         // --- 步骤一：获取购买信息 ---
         dialog.cont.add("[orange]步骤 1: 前往赞助获取订单编号").padTop(10).left().row();
         dialog.cont.button("前往赞助", (() -> {
