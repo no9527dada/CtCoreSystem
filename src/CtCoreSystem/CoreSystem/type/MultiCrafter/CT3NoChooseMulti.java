@@ -1,10 +1,14 @@
 package CtCoreSystem.CoreSystem.type.MultiCrafter;
 /*多合成并行*/
 
+import CtCoreSystem.CoreSystem.type.No9527.BlockTextRenderer;
+import CtCoreSystem.CoreSystem.type.No9527.建筑贴图隐藏;
 import CtCoreSystem.CoreSystem.type.V8.ItemDisplay;
 import CtCoreSystem.CoreSystem.type.V8.LiquidDisplay;
 import arc.Core;
 import arc.graphics.Color;
+import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.Fill;
 import arc.math.Mathf;
 import arc.scene.ui.Button;
 import arc.struct.ObjectSet;
@@ -26,6 +30,7 @@ import mindustry.world.blocks.production.GenericCrafter;
 import mindustry.world.consumers.ConsumePower;
 import mindustry.world.meta.Stat;
 
+import static CtCoreSystem.CtCoreSystem.方块贴图;
 import static arc.Core.bundle;
 import static arc.Core.scene;
 import static mindustry.Vars.headless;
@@ -34,7 +39,6 @@ public class CT3NoChooseMulti extends GenericCrafter {
     public final CreatorsRecipe[] recs;
     private int index = 0;
     public Color TableColor = Color.yellow;
-
     public final ObjectSet<Item> inputItemSet = new ObjectSet<>();
     public final ObjectSet<Liquid> inputLiquidSet = new ObjectSet<>(), liquidSet = new ObjectSet<>();
 
@@ -58,44 +62,49 @@ public class CT3NoChooseMulti extends GenericCrafter {
         this(name, new CreatorsRecipe[recLen]);
     }
 
-    @Override
-    public void setBars() {
-        super.setBars();
-        removeBar("power");
+   @Override
+public void setBars() {
+    super.setBars();
+    removeBar("power");
 
-        if (consPower != null) {
-            addBar("power", (CT3NoChooseMulti.CreatorsNoChooseMultiBuild entity) ->
-                    new Bar(() -> bundle.format("bar.powerA", Strings.fixed(entity.block.consPower.requestedPower(entity) * 60 * entity.timeScale(), 1)),
-                            () -> Pal.powerBar,
-                            () -> entity.power.status)
-            );
-        }
-
-        removeBar("liquid");
-        removeBar("items");
-        if (!powerBarI && hasPower) removeBar("power");
-        if (powerBarO) {
-            addBar("poweroutput", (CT3NoChooseMulti.CreatorsNoChooseMultiBuild entity) ->
-                    new Bar(() -> bundle.format("bar.poweroutputA", Strings.fixed(entity.getPowerProduction() * 60 * entity.timeScale(), 1)),
-                            () -> Pal.powerBar,
-                            () -> entity.getPowerProduction() == 0 ? 0f : 1f)
-            );
-        }
-        if (!liquidSet.isEmpty()) {
-            liquidSet.each(k -> addBar(k.localizedName, entity -> new Bar(() -> k.localizedName + "[" + entity.liquids.get(k) + "]", k::barColor, () -> entity.liquids.get(k) / liquidCapacity)));
-        }
-
-        for (var i = 0; i < recs.length; i++) {
-            int finalI = i;
-            addBar("配方条" + i, (CT3NoChooseMulti.CreatorsNoChooseMultiBuild e) ->
-                    new Bar(
-                            () -> bundle.format("bar.warmup", Math.floor(e.进度条(finalI) * 100.0f) + " %"),
-                            () -> Pal.powerBar,
-                            () -> e.进度条(finalI)
-                    )
-            );
-        }
+    if (consPower != null) {
+        addBar("power", (CT3NoChooseMulti.CreatorsNoChooseMultiBuild entity) ->
+                new Bar(() -> bundle.format("bar.powerA", Strings.fixed(entity.block.consPower.requestedPower(entity) * 60 * entity.timeScale(), 1)),
+                        () -> Pal.powerBar,
+                        () -> entity.power.status)
+        );
     }
+
+    removeBar("liquid");
+    removeBar("items");
+    if (!powerBarI && hasPower) removeBar("power");
+    if (powerBarO) {
+        addBar("poweroutput", (CT3NoChooseMulti.CreatorsNoChooseMultiBuild entity) ->
+                new Bar(() -> bundle.format("bar.poweroutputA", Strings.fixed(entity.getPowerProduction() * 60 * entity.timeScale(), 1)),
+                        () -> Pal.powerBar,
+                        () -> entity.getPowerProduction() == 0 ? 0f : 1f)
+        );
+    }
+    if (!liquidSet.isEmpty()) {
+        liquidSet.each(k -> addBar(k.localizedName, entity -> new Bar(
+            () -> k.localizedName + "[" + Math.round(entity.liquids.get(k)) + "]",
+            k::barColor,
+            () -> entity.liquids.get(k) / liquidCapacity
+        )));
+    }
+
+    for (var i = 0; i < recs.length; i++) {
+        int finalI = i;
+        addBar("配方条" + i, (CT3NoChooseMulti.CreatorsNoChooseMultiBuild e) ->
+                new Bar(
+                        () -> bundle.format("bar.warmup", Math.floor(e.进度条(finalI) * 100.0f) + " %"),
+                        () -> Pal.powerBar,
+                        () -> e.进度条(finalI)
+                )
+        );
+    }
+}
+
 
     @Override
     public void setStats() {
@@ -222,11 +231,28 @@ public class CT3NoChooseMulti extends GenericCrafter {
     }
 
     public class CreatorsNoChooseMultiBuild extends GenericCrafterBuild {
+
         public boolean[] 生产状态 = new boolean[recs.length];
         public float[] 加工时间 = new float[recs.length];
 
         public float 进度条(int i) {
             return 加工时间[i] / recs[i].craftTime;
+        }
+
+        public  Color getStatusColor() {
+
+            // 检查是否有配方满足输入条件但无法输出（待机状态）
+            for (var i = 0; i < recs.length; i++) {
+                    // 检查输出是否会被阻塞（即输出槽满）
+                    if (检测输出阻塞(recs[i].output)) {
+                        return Color.orange; // 待机时黄色 - 输出被阻塞
+                    }
+            }
+            // 检查是否有正在工作的配方
+            for (boolean active : 生产状态) {
+                if (active) return Color.green; // 工作时绿色
+            }
+            return Pal.remove; // 缺失时红色
         }
 
         public boolean 检测消耗(CreatorsRecipe.InputContents a) {
@@ -316,6 +342,38 @@ public class CT3NoChooseMulti extends GenericCrafter {
                 }
             }
         }
+public boolean 检测输出阻塞(CreatorsRecipe.OutputContents output) {
+    // 检查物品输出是否会被阻塞
+    if (output.items != null) {
+        for (var itemStack : output.items) {
+            if (items.get(itemStack.item) >= this.block.itemCapacity) {
+                return true; // 物品槽已满
+            }
+        }
+    }
+
+    // 检查液体输出是否会被阻塞
+    if (output.liquids != null) {
+        for (var liquidStack : output.liquids) {
+            if (liquids.get(liquidStack.liquid) >= this.block.liquidCapacity) {
+                return true; // 液体槽已满
+            }
+        }
+    }
+
+/*
+
+    // 检查功率输出（如果有）//电力没有输出阻塞 注释掉
+    if (output.power > 0 && this.block.outputsPower) {
+        // 如果功率无法输出，可能也需要考虑
+        if (this.power != null && this.power.graph.getLastPowerProduced() <= 0) {
+            return true;
+        }
+    }
+*/
+
+    return false; // 没有输出阻塞
+}
 
         @Override
         public void updateTile() {
@@ -398,6 +456,28 @@ public class CT3NoChooseMulti extends GenericCrafter {
                 return inputLiquidSet.contains(liquid);
             } else {
                 return false;
+            }
+        }
+        @Override
+        public void draw() {
+            if(方块贴图==true) {
+                drawer.draw(this);
+            }else {
+                // 使用工具类渲染方块文字
+                BlockTextRenderer.renderBlockText(x, y, localizedName, block.size);
+            }
+            // 绘制状态指示灯
+            if (this.block.enableDrawStatus ) {
+                float multiplier = this.block.size > 1 ? 1.0F : 0.64F;
+                float brcx = this.x + (float)(this.block.size * 8) / 2.0F - 8.0F * multiplier / 2.0F;
+                float brcy = this.y - (float)(this.block.size * 8) / 2.0F + 8.0F * multiplier / 2.0F;
+
+                Draw.z(71.0F);
+                Draw.color(Pal.gray);
+                Fill.square(brcx, brcy, 2.5F * multiplier, 45.0F);
+                Draw.color(getStatusColor());
+                Fill.square(brcx, brcy, 1.5F * multiplier, 45.0F);
+                Draw.color();
             }
         }
     }

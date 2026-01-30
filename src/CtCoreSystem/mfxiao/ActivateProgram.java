@@ -2,6 +2,7 @@ package CtCoreSystem.mfxiao;
 
 import arc.Core;
 import arc.files.Fi;
+import arc.graphics.Color;
 import arc.scene.ui.Dialog;
 import arc.scene.ui.Label;
 import arc.scene.ui.TextField;
@@ -13,25 +14,54 @@ import arc.util.Time;
 import mindustry.Vars;
 import mindustry.gen.Tex;
 import mindustry.ui.dialogs.BaseDialog;
+import mindustry.ui.dialogs.JoinDialog;
+
+import java.nio.file.Files;
 import java.util.Base64;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 import static CtCoreSystem.CtCoreSystem.*;
+import static CtCoreSystem.CtCoreSystem.toText;
 import static CtCoreSystem.CtURL.爱发电;
 import static CtCoreSystem.CtURL.赞助QQ群;
+
 
 public class ActivateProgram {
     // 许可证文件路径
     public static final Fi LICENSE_FILE = Core.settings.getDataDirectory().child("mods/creatorsdlc/license.dat");
     // 激活状态标志
-  public static boolean isActivated = false;
+    public static boolean isActivated = false;
     //状态配置文件
     private static final Fi ACTIVATION_STATE_FILE = Core.settings.getDataDirectory().child("mods/creatorsdlc/activation_state.json");
+    // 保存初始激活状态
+    private static boolean initialActivationState = false;
+    // 新增：标记当前是否为移动设备
+  //  private static boolean isMobileDevice = false;
 
-    // 新增：初始化时加载保存的激活状态
     static {
+
+        // 初始化时加载保存的激活状态
         loadActivationState();
+        // 如果已保存了订单信息，尝试自动验证
+      /*  if ( LICENSE_FILE.exists()) {
+            try {
+                String content = LICENSE_FILE.readString().trim();
+                if (!content.isEmpty() && content.contains(":")) {
+                    Log.info("检测到且有保存的订单信息，尝试自动验证");
+                    String[] parts = content.split(":");
+                    if (parts.length >= 2) {
+                        String savedPlayerName = parts[0];
+                        String savedOrderId = parts[1];
+                        verifyMobileLicenseAsync(savedPlayerName, savedOrderId);
+                    }
+                }
+            } catch (Exception e) {
+                Log.err("读取保存的订单信息失败: " + e.getMessage());
+            }
+        }*/
     }
+
     // 加载保存的激活状态
     private static void loadActivationState() {
         if (ACTIVATION_STATE_FILE.exists()) {
@@ -56,6 +86,8 @@ public class ActivateProgram {
         } else {
             Log.info("未找到激活状态文件，使用默认状态");
         }
+        // 保存初始激活状态
+        initialActivationState = isActivated;
     }
 
     //保存激活状态到文件
@@ -68,31 +100,84 @@ public class ActivateProgram {
             ACTIVATION_STATE_FILE.writeString(encodedState, false);
             String encodedState2 = isActivated ? "1" : "0";
             Log.info("激活状态已保存：" + encodedState2);
+
+
+
         } catch (Exception e) {
             Log.err("保存激活状态失败：" + e.getMessage());
         }
     }
+    // 检查激活状态变化的方法
+    private static void checkActivationStateChange() {
+        // 只有当初始状态和当前状态不同时才显示重启提示
+        if (initialActivationState != isActivated) {
 
+            if(isActivated==true){
+                Log.info("激活状态已改变，需要重启游戏以应用变更");
+                Core.app.post(() -> showCustomDialog("", cont -> {
+                    cont.add(Core.bundle.format("activation.error.StateChange1")).row();
+                }));
+            }else {
+                Log.info("激活状态已改变，需要重启游戏以应用变更");
+                Core.app.post(() -> showCustomDialog("", cont -> {
+                    cont.add(Core.bundle.format("activation.error.StateChange0")).row();
+                }));
+            }
+
+
+        }
+    }
+    //有激活文件会联网进行验证 在CtCoreSystem类中使用
     public static void startActivationProcess() {
         try {
-            // 检查本地是否存在许可证文件
+            if (LICENSE_FILE.exists()) {
+                try {
+                    String content = LICENSE_FILE.readString().trim();
+                    if (content.contains(":")) {
+                        String[] parts = content.split(":", 2);
+                        // 加强格式验证：确保分割后有两个有效部分
+                        if (parts.length == 2 && !parts[0].isEmpty() && !parts[1].isEmpty()) {
+                            String savedPlayerName = parts[0];
+                            String savedEncryptedOrderId = parts[1];
 
-            // 移除内部对LICENSE_FILE存在性的检查，因为外部调用前已经检查过
-            // 直接获取许可证密钥进行验证
-            String licenseKey = LICENSE_FILE.readString().trim();
-            if (!licenseKey.isEmpty()) {
-                Log.info("找到本地许可证文件，正在同步验证...");
-                String playerName = Vars.player.name();
-                String playerUuid = Vars.player.uuid();
+                            try {
+                                // 解密订单号
+                                String savedOrderId = RSAEncryptionUtil.decryptOrderId(savedEncryptedOrderId);
 
-                boolean success = RSAEncryptionUtil.verifyLicense(playerName, playerUuid, licenseKey);
-
-                if (success) {
-                    Log.info("本地许可证验证成功！");
-                    isActivated = true;
-                    saveActivationState();
-                } else {
-                    Log.err("本地许可证验证失败.可能原因：激活码已失效或注册名称已被封禁");
+                                // 使用解密后的订单号进行验证
+                                verifyMobileLicenseAsync(savedPlayerName, savedOrderId);
+                            } catch (Exception e) {
+                                Log.err("读取加密订单号时出错: " + e.getMessage());
+                                // 在解密失败时立即设置激活状态为false并保存
+                                isActivated = false;
+                                主动关闭激活 = false;
+                                saveActivationState();
+                                PopUpWindow2("", cont -> {
+                                    cont.add(Core.bundle.format("activation.error.localfileinvalid")).row();
+                                });
+                            }
+                        } else {
+                            Log.err("激活文件无效1");
+                            isActivated = false;
+                            主动关闭激活 = false;
+                            saveActivationState();
+                            showActivationDialog("@activation.error.invalidkey");
+                            PopUpWindow2("", cont -> {
+                                cont.add(Core.bundle.format("activation.error.localfileinvalid")).row();
+                            });
+                        }
+                    } else {
+                        Log.err("激活文件无效2");
+                        isActivated = false;
+                        主动关闭激活 = false;
+                        saveActivationState();
+                        showActivationDialog("@activation.error.invalidkey");
+                        PopUpWindow2("", cont -> {
+                            cont.add(Core.bundle.format("activation.error.localfileinvalid")).row();
+                        });
+                    }
+                } catch (Exception e) {
+                    Log.err("读取加密订单号时出错: " + e.getMessage());
                     isActivated = false;
                     主动关闭激活 = false;
                     saveActivationState();
@@ -100,12 +185,9 @@ public class ActivateProgram {
                         cont.add(Core.bundle.format("activation.error.localfileinvalid")).row();
                     });
                 }
-            } else {
-                Log.info("许可证文件存在但内容为空");
-                isActivated = false;
-                主动关闭激活 = false;
-                saveActivationState();
             }
+
+
         } catch (Throwable t) {
             // 检查是否是Jackson Core相关的类加载错误
             if (t instanceof NoClassDefFoundError && t.getMessage() != null &&
@@ -121,7 +203,7 @@ public class ActivateProgram {
                     g.add(Core.bundle.format("activation.error.info")).align(Align.center).row();
                     g.button("@wait", (dialog::hide)).size(100, 64).center();//关闭按钮
                     // 新增：添加一个重置按钮，点击后删除激活文件重置状态
-                    g.button("@delete", () -> {
+                    g.button("@delete1", () -> {
                         // 删除激活文件和许可证文件
                         ACTIVATION_STATE_FILE.delete();
                         LICENSE_FILE.delete();
@@ -142,52 +224,83 @@ public class ActivateProgram {
             }
         }
     }
-    /**
-     * 验证许可证 (用于用户手动激活)
-     *
-     * @param licenseKey 用户提供的许可证密钥
-     */
-    private static void verifyLicenseAsync(String licenseKey) {
+    // 这是有激活文件后调用的方法  会联网进行验证
+    // 修改verifyMobileLicenseAsync方法以处理解密失败返回null的情况
+    private static void verifyMobileLicenseAsync(String playerName, String orderIds) {
         Dialog processing = new Dialog("");
         processing.cont.add("@loading").pad(20);
         processing.setModal(true);
-        processing.show();
+        processing.hide();//有激活文件后隐藏弹窗
 
-        // 在后台线程中执行网络请求和密码学验证，避免阻塞UI
-        Threads.daemon("License-Verification", () -> {
-            String playerName = Vars.player.name();
-            String playerUuid = Vars.player.uuid();
-            boolean success = RSAEncryptionUtil.verifyLicense(playerName, playerUuid, licenseKey);
-
-            // 验证完成后，回到主线程更新UI
-            Core.app.post(() -> {
-                processing.hide(); // 隐藏“处理中”对话框
-                if (success) {
-                    Log.info("许可证验证成功！");
-                    // 如果验证成功，将许可证密钥保存到本地文件
-                    if (!LICENSE_FILE.exists() || !LICENSE_FILE.readString().trim().equals(licenseKey)) {
-                        LICENSE_FILE.writeString(licenseKey, false);
-                        Log.info("许可证已保存至本地。");
-                    }
-                    onActivationSuccess(); // 调用激活成功地回调
-                   // isActivated = true;
-                    saveActivationState(); // 新增：保存激活状态
-                    // 显示激活成功的提示信息
-                    showCustomDialog("", cont -> {
-                        cont.margin(15);
-                        cont.add("@activation.success").width(400f).wrap().get().setAlignment(Align.center, Align.center);
-                    });
-
+        // 在后台线程中执行网络请求
+        Threads.daemon("Mobile-License-Verification", () -> {
+            boolean success = false;
+            try {
+                // 直接使用传入的订单号，不再进行解密
+                String orderId = orderIds;
+                if (orderId == null || orderId.isEmpty()) {
+                    // 订单号为空
+                    arc.util.Log.err("许可证验证失败：订单号为空");
+                    success = false;
                 } else {
-                    Log.err("许可证验证失败。");
+                    // 直接调用RSAEncryptionUtil中的fetchValidationData方法获取验证数据
+                    Map<String, String> validationData = RSAEncryptionUtil.fetchValidationData();
+
+                    // 遍历所有键值对查找匹配的订单号和玩家名
+                    for (Map.Entry<String, String> entry : validationData.entrySet()) {
+                        if (entry.getValue().equals(orderId)) {
+                            String key = entry.getKey(); // 形如 玩家名:[LOCAL]
+                            int idx = key.indexOf(':');
+                            String registeredPlayerName = (idx > -1) ? key.substring(0, idx) : key;
+
+                            if (registeredPlayerName.equals(playerName)) {
+                                success = true;
+                               // arc.util.Log.info("许可证验证成功！订单号: " + orderId + ", 玩家名: " + playerName);
+                                arc.util.Log.info("玩家名: " + playerName + ", 已成功验证登录！");
+                                break;
+                            }
+                        }
+                    }
+                    if (!success) {
+                        arc.util.Log.warn("许可证检查失败：玩家名已注销。");
+                    }
+                }
+            } catch (Exception e) {
+                String errorMsg = e.getMessage();
+                if (errorMsg != null && errorMsg.contains("gitee.com")) {
+                    //无网络连接时 本地文件验证成功  也被认为是成功
+                    success = true;
+                    arc.util.Log.warn("许可证验证过程中发生网络异常: 无法连接到验证服务器");
+                } else {
+                    arc.util.Log.err("许可证验证过程中发生异常: " + errorMsg);
+                }
+                e.printStackTrace();
+            }
+            // 验证完成后，回到主线程更新UI
+            final boolean finalSuccess = success;
+            Core.app.post(() -> {
+                // 确保对话框被隐藏
+                processing.hide();
+
+                if (finalSuccess) {
+                    isActivated = true;
+                    saveActivationState();
+                    arc.util.Log.info("赞助激活状态确认 " + ActivateProgram.isActivated);
+                    // 检查激活状态是否发生变化
+                    checkActivationStateChange();
+                } else {
+                    arc.util.Log.err("许可证验证失败。");
                     isActivated = false;
-                    saveActivationState(); // 新增：保存激活状态
+                    主动关闭激活 = false;
+                    saveActivationState();
                     showActivationDialog("@activation.error.invalidkey");
+                    PopUpWindow2("", cont -> {
+                        cont.add(Core.bundle.format("activation.error.localfileinvalid")).row();
+                    });
                 }
             });
         });
     }
-
 
 
     /**
@@ -196,88 +309,215 @@ public class ActivateProgram {
      * @param message 对话框顶部显示的提示信息
      */
     public static void showActivationDialog(String message) {
-        // 添加调用追踪日志
-        Log.info("showActivationDialog called with message: " + message);
-
-        String QQ群2 = "https://jq.qq.com/?_wv=1027&k=oygqLbJ5";
         BaseDialog dialog = new BaseDialog("@activation.title");
         dialog.addCloseButton();
 
         // 提示信息
         dialog.cont.add(message).wrap().growX().pad(10).row();
-        dialog.cont.add(Core.bundle.format("activation.io")).center().growX().wrap().width(620).maxWidth(620).pad(4).labelAlign(Align.center).row();
+
+        dialog.cont.button(toText("activation.infoio"), (() -> {
+            BaseDialog dialog2 = new BaseDialog("");
+            dialog2. buttons.defaults().size(210, 64);//为 dialog2 对话框的按钮表格中后续添加的所有按钮设置默认尺寸。
+            dialog2.cont.add(Core.bundle.format("activation.io")).center().growX().wrap().width(620).maxWidth(620).pad(4).labelAlign(Align.center).row();
+            dialog2.addCloseButton();// 同时添加可见按钮和返回键关闭功能
+          // dialog2. addCloseListener();// 仅添加返回键关闭功能 没有按钮
+           // dialog2. buttons.button("@close", (dialog2::hide)).size(100, 64);//有关闭按钮 没有返回键
+            dialog2.show();
+        })).width(220f).pad(4).growX().left().center().row();
+
         // --- 步骤一：获取购买信息 ---
-        dialog.cont.add("[orange]步骤 1: 前往赞助获取订单编号").padTop(10).left().row();
-        dialog.cont.button("前往赞助", (() -> {
+        dialog.cont.add(toText("activation.info1")).padTop(10).left().row();
+        dialog.cont.button(toText("activation.info2"), (() -> {
             if (!Core.app.openURI(爱发电)) {
                 Vars.ui.showErrorMessage("@linkfail");
                 Core.app.setClipboardText(爱发电);
             }
         })).width(220f).pad(4).growX().left().row();
 
-        dialog.cont.add("[orange]步骤 2: 获取并复制您的购买信息发送给开发者进行注册").padTop(10).left().row();
-        dialog.cont.add(new Label("你的名称: " + Vars.player.name)).pad(5).left().row();
-      //  dialog.cont.add(new Label("你的UUID: " + Vars.player.uuid())).pad(5).left().row();
+
+        // --- 步骤二：输入订单号 ---
+        TextField playerNameField = new TextField();
+        playerNameField.setText(Vars.player.name());
+        boolean hasError;
+        String playerNamee = Vars.player.name();
+        if(playerNamee == null || playerNamee.isEmpty()){
+            dialog.cont.add(toText("activation.info3")).left().row();
+            hasError = true;
+            dialog.cont.button(toText("activation.info4"), (() -> {
+                new JoinDialog().show();
+                dialog.hide();
+            })).width(220f).pad(4).growX().left().row();
+        } else if(playerNamee.contains(" ")){
+            dialog.cont.add(toText("activation.info5")).left().row();
+            hasError = true;
+            dialog.cont.button(toText("activation.info6"), (() -> {
+                new JoinDialog().show();
+                dialog.hide();
+            })).width(220f).pad(4).growX().left().row();
+        } else {
+            hasError = false;
+            dialog.cont.add(toText("activation.info7") + playerNamee).left().row();
+        }
+       // dialog.cont.add(playerNameField).growX().pad(5).row();
 
         TextField orderIdField = new TextField();
-        orderIdField.setMessageText("在此输入你的订单编号");
+        orderIdField.setMessageText(toText("activation.info8"));
+        dialog.cont.add(toText("activation.info9")).left().row();
         dialog.cont.add(orderIdField).growX().pad(5).row();
-        dialog.cont.button("复制购买信息", () -> {
-            String orderId = orderIdField.getText().trim();
-            if (orderId.isEmpty()) {
-                Vars.ui.showInfo("@activation.error.noorderid");
+        dialog.row();
+        dialog.cont.add(toText("activation.info10")).padTop(10).left().row();
+        dialog.cont.button(toText("activation.info11"), () -> {
+            if(hasError) {
+                Vars.ui.showInfo(toText("activation.info12"));
                 return;
             }
-
-            // 获取玩家信息
-            String playerName = Vars.player.name;
-            String playerUuid = Vars.player.uuid();
-
-            // 组合信息
-            String requestData = playerName + ":" + playerUuid + ":" + orderId;
-
-            // 使用 Java 内置的 Base64 编码器
-            String base64Request = Base64.getEncoder().encodeToString(requestData.getBytes(StandardCharsets.UTF_8));
-
-            // 复制到剪贴板
-            Core.app.setClipboardText(base64Request);
-            Vars.ui.showInfo("@copied");
-
+                    String playerName = playerNameField.getText().trim();
+                    String orderId = orderIdField.getText().trim();
+                    if (playerName.isEmpty() || orderId.isEmpty()) {
+                        Vars.ui.showInfo("@activation.error.noorderid");
+                    }else {
+                        Core.app.setClipboardText("\""+playerName + ":[LOCAL]\": \"" + orderId+"\","); //
+                        Vars.ui.showInfo("@ctcopied");
+                    }
         }).width(220f).pad(4).growX().left().row();
+        dialog.row();
 
-        dialog.cont.add("[orange]步骤 3: 加入QQ群获取激活码").padTop(10).left().row();
-        dialog. cont.button(Core.bundle.format("QQ群2"), (() -> {
+        // --- 步骤三：加入QQ群获取激活码 ---
+        dialog.cont.add(toText("activation.info13")).padTop(10).left().row();
+        dialog.cont.button(toText("activation.info14"), (() -> {
             if (!Core.app.openURI(赞助QQ群)) {
                 Vars.ui.showErrorMessage("@linkfail");
                 Core.app.setClipboardText(赞助QQ群);
             }
         })).update(b -> b.color.fromHsv(Time.time % 360, 1, 1)).size(250.0f, 50).padTop(10).left().row();
 
-        dialog.cont.add("[orange]步骤 4: 粘贴开发者给你的激活码并激活").padTop(10).left().row();
+        // --- 步骤四：粘贴开发者给你的激活码并激活 ---
+        dialog.cont.add(toText("activation.info15")).padTop(10).left().row();
+
+        // 密匙输入框
         TextField keyField = new TextField();
-        keyField.setMessageText("在此粘贴激活码");
+        keyField.setMessageText(toText("activation.info16"));
+        dialog.cont.add(toText("activation.info17")).left().row();
         dialog.cont.add(keyField).growX().pad(5).row();
 
-        dialog.cont.button("激活", () -> {
+        dialog.cont.button(toText("activation.info18"), () -> {
+            String playerName = playerNameField.getText().trim();
             String key = keyField.getText().trim();
-            if (!key.isEmpty()) {
-                dialog.hide();
-                verifyLicenseAsync(key);
-            } else {
+            if (playerName.isEmpty() || key.isEmpty()) {
                 Vars.ui.showInfo("@activation.error.nokey");
+                return;
             }
-        }).width(220f).pad(4).growX().left().row();
-        dialog.setModal(true);
+            dialog.hide();
+            // 修改：调用新的验证方法，传递游戏名称和密匙
+            verifyMobileKeyAsync(playerName, key);
+        }).width(220f).pad(4).growX().center().row();
 
+        dialog.setModal(true);
         dialog.show();
     }
-    /**
-     * 激活成功后的回调函数
-     */
-    public static void onActivationSuccess() {
-        if (isActivated) return; // 防止重复执行
-        isActivated = true;
-        saveActivationState(); // 新增：保存激活状态
-        Log.info("激活状态已设置。");
+
+    // 这是玩家在填写激活码时调用的方法  会联网进行验证  如果验证成功  会在本地保存一个文件  文件名是玩家名  文件内容是订单号
+    private static void verifyMobileKeyAsync(String playerName, String key) {
+        Dialog processing = new Dialog("");
+        processing.cont.add("@loading").pad(20);
+        processing.setModal(true);
+        processing.show();
+
+        // 在后台线程中执行网络请求
+        Threads.daemon("Mobile-Key-Verification", () -> {
+            boolean success = false;
+            try {
+                // 1. 直接调用RSAEncryptionUtil中的fetchValidationData方法获取验证数据
+                Map<String, String> validationData = RSAEncryptionUtil.fetchValidationData();
+
+                // 2. 解密密匙获取原始订单号
+                String orderId = RSAEncryptionUtil.decryptOrderId(key);
+               // Log.info("解密后的订单号: " + orderId);
+
+                // 3. 检查订单号是否存在且对应的玩家名是否匹配
+                // 遍历所有键值对查找匹配的订单号和玩家名
+                for (Map.Entry<String, String> entry : validationData.entrySet()) {
+                    if (entry.getValue().equals(orderId)) {
+                        String storedKey = entry.getKey(); // 形如 玩家名:[LOCAL]
+                        int idx = storedKey.indexOf(':');
+                        String registeredPlayerName = (idx > -1) ? storedKey.substring(0, idx) : storedKey;
+
+                        if (registeredPlayerName.equals(playerName)) {
+                            success = true;
+                           // Log.info("密匙验证成功！订单号: " + orderId + ", 玩家名: " + playerName);
+                            break;
+                        }
+                    }
+                }
+
+                if (!success) {
+                    // 添加验证失败的日志记录
+                    Log.err("密匙验证失败: 未找到匹配的订单号和玩家名");
+            /*        PopUpWindow("", cont -> {
+                        cont.add(Core.bundle.format("activation.error.noUserName"));
+                    });*/
+                }
+            } catch (Exception e) {
+                String errorMsg = e.getMessage();
+                if (errorMsg != null && errorMsg.contains("gitee.com")) {
+                    arc.util.Log.err("许可证验证过程中发生网络异常: 无法连接到验证服务器");
+                    PopUpWindow("", cont -> {
+                        cont.add(Core.bundle.format("activation.error.NetworkError"));
+                    });
+                    processing.hide(); // 隐藏处理中对话框
+                    return;
+                } else {
+                    arc.util.Log.err("许可证验证过程中发生异常: " + errorMsg);
+
+                }
+
+                // 确保在主线程中显示对话框并隐藏处理中对话框
+                Core.app.post(() -> {
+                    processing.hide(); // 重要：隐藏处理中对话框
+
+                    // 弹出对话框提示用户复制异常日志
+                    BaseDialog dialog = new BaseDialog("");
+                    dialog.addCloseButton();
+                    dialog.cont.add(toText("info19")).row();
+                    dialog.cont.add(toText("info20")).row();
+                    dialog.cont.add(toText("info21") + e.getMessage()).row();
+                    dialog.cont.button(toText("info22"), () -> {
+                        Core.app.setClipboardText(e.getMessage()); // 仅复制错误信息
+                        dialog.hide();
+                        Vars.ui.showInfo("@copied");
+                    }).padTop(5).width(200f).height(50).row();
+                    dialog.show();
+                });
+                e.printStackTrace(); // 仍然保留日志记录，但不显示给用户
+            }
+
+            // 验证完成后，回到主线程更新UI
+            final boolean finalSuccess = success;
+            Core.app.post(() -> {
+                processing.hide(); // 隐藏"处理中"对话框
+                if (finalSuccess) {
+                    // 如果验证成功，保存密匙到本地文件
+                    String licenseContent = playerName + ":" + key;
+                    if (!LICENSE_FILE.exists() || !LICENSE_FILE.readString().trim().equals(licenseContent)) {
+                        LICENSE_FILE.writeString(licenseContent, false);
+                        Log.info("激活密匙已保存至本地。");
+                    }
+                    isActivated = true;
+                    saveActivationState();
+                    Log.info("赞助激活状态确认 " + ActivateProgram.isActivated);
+                    // 显示激活成功的提示信息
+                    showCustomDialog("", cont -> {
+                        cont.margin(15);
+                        cont.add("@activation.success").width(400f).wrap().get().setAlignment(Align.center, Align.center);
+                    });
+                } else {
+                    Log.err("密匙验证失败。");
+                    isActivated = false;
+                    saveActivationState();
+                    showActivationDialog("@activation.error.invalidkey");
+                }
+            });
+        });
     }
+
 }

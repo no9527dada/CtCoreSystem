@@ -1,12 +1,13 @@
 {
   "name": "ctcoresystem",
   "displayName": "创世神核心加载系统前置",
-  "author": "9527",
+  "author": "NO:9527",
   "description": "Creators Core System",
-  "version": "1.40",
-  "minGameVersion": 150,
+  "version": "1.53",
+  "minGameVersion": 154,
   "main": "CtCoreSystem.CtCoreSystem",
  // "main": "ccdd.ccdd",
   "java":true
  // "hidden": true,
 }
+//@ctcoresystem-breakdown

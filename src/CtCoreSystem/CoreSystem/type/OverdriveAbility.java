@@ -2,6 +2,7 @@ package CtCoreSystem.CoreSystem.type;
 
 import arc.Core;
 import arc.graphics.Color;
+import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
 import arc.math.Interp;
 import arc.math.geom.Rect;
@@ -13,6 +14,7 @@ import mindustry.entities.Effect;
 import mindustry.entities.abilities.Ability;
 import mindustry.game.Team;
 import mindustry.gen.Unit;
+import mindustry.graphics.Layer;
 import mindustry.ui.Styles;
 
 //单位给方块超速力场能力
@@ -29,6 +31,7 @@ public class OverdriveAbility extends Ability {
 // 己方效果的视觉效果
     public Effect friendlyEffect = new Effect(effectDuration, (e) -> {
         //  Color teamColor = e.data instanceof Color ? (Color)e.data : Team.derelict.color;
+         Draw.z(Layer.effect);
         Lines.stroke(2f * e.fout(), Team.sharded.color);
         Lines.rect(rect(e.x, e.y, friendlyRange * e.finpow()));
     });
@@ -110,10 +113,12 @@ public class OverdriveAbility extends Ability {
 
             // 根据单位所属方显示相应的特效范围
             if (unit.team == Team.sharded) {
+                Draw.z(Layer.effect);
                 // 如果是玩家方单位，显示己方特效范围
                 Lines.stroke(1f , Team.sharded.color);
                 Lines.rect(rect(unit.x, unit.y, friendlyRange ));
             } else {
+                Draw.z(Layer.effect);
                 // 如果是敌方单位，显示敌方特效范围
                 Lines.stroke(3f , unit.team.color);
                 Lines.rect(rect(unit.x, unit.y, enemyRange));

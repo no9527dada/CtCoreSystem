@@ -8,4 +8,5 @@ public class CtURL {
     public static String 网盘 =  "https://pan.quark.cn/s/571579daddcf";//V8
       public static   String TDGit = "https://github.com/no9527dada/CreatorTD/releases";
       public static   String FPGit = "https://github.com/no9527dada/CT3FantasyProject/releases";
+      public static   String 视频教程 = "https://www.bilibili.com/video/BV12u4y1Q7Ft/";
 }

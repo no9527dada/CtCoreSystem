@@ -13,6 +13,9 @@ import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.world.Tile;
 
+import static CtCoreSystem.CoreSystem.type.CTColor.C;
+import static CtCoreSystem.CtCoreSystem.敌人行进路径;
+
 /*
  *@Date  :2024/5/13
  */
@@ -26,12 +29,16 @@ public class SpawnDraw {
     public static boolean[] enables = new boolean[]{true, true, true};
 
 
-    public static Color[] colors = new Color[]{Color.red, Pal.reactorPurple, Liquids.water.color};
+    public static Color[] colors = new Color[]{Color.red, C("bd6cff"), C("41d0ff")};//Pal.reactorPurple
 
     public static void init() {
-        Events.run(EventType.Trigger.draw, () -> Draw.draw(Layer.flyingUnit + 2.5f, draw));
+        Events.run(EventType.Trigger.draw, () -> {
+            // 检查全局设置开关
+            if (敌人行进路径) {
+                Draw.draw(Layer.flyingUnit + 2.5f, draw);
+            }
+        });
     }
-
     public static boolean isEnable(int index) {
         return enables[index];
     }

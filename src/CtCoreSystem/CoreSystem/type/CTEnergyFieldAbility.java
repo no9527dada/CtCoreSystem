@@ -14,13 +14,15 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.ui.Bar;
 import mindustry.world.meta.*;
 import mindustry.entities.abilities.Ability;
 
+import static CtCoreSystem.CtCoreSystem.toText;
 import static mindustry.Vars.*;
 
 /**
- * 基于EnergyFieldAbility修改的具体数值治疗版本
+ * 基于EnergyFieldAbility修改的具体数值治疗的能力版本
  */
 public class CTEnergyFieldAbility extends Ability {
     private static final Seq<Healthc> all = new Seq<>();
@@ -28,7 +30,7 @@ public class CTEnergyFieldAbility extends Ability {
     public float damage = 1, reload = 100, range = 60;
     public Effect healEffect = Fx.heal, hitEffect = Fx.hitLaserBlast, damageEffect = Fx.chainLightning;
     public StatusEffect status = StatusEffects.electrified;
-    public Sound shootSound = Sounds.spark;
+    public Sound shootSound = Sounds.shootArc;
     public float statusDuration = 60f * 6f;
     public float x, y;
     public boolean targetGround = true, targetAir = true, hitBuildings = true, hitUnits = true;
@@ -66,7 +68,11 @@ public class CTEnergyFieldAbility extends Ability {
         this.range = range;
         this.healAmount = healAmount;
     }
-
+   public void displayBars(Unit unit, Table bars) {
+       bars.add(toText("ability.energyfield")).row();
+    }
+    // UI 显示名称
+    public String localizedName = toText("ability.energyfield");
     @Override
     public void addStats(Table t) {
         if (displayHeal) {

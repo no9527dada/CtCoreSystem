@@ -102,7 +102,7 @@ public class CT3InfoDialog {
                         table.add(Core.bundle.format("CT3framer_txt")).left().growX().wrap().width(620).maxWidth(620).pad(4).labelAlign(Align.left);
                         table.row();
                         table.button(Core.bundle.format("love9527"), (() -> {
-                            new Award9527().show();
+                            new 激活进入().show();
                         })).size(510, 64).update(i ->
                                 i.getLabel().setColor(new Color().set(Color.white).lerp(C("fd5bff"),
                                         Mathf.absin(2f, 1f)))

@@ -78,7 +78,6 @@ public class CreatorsRecipe {
         public OutputContents(ItemStack[] items, LiquidStack[] liquids) {
             this(items, liquids, 0f);
         }
-
         public OutputContents(ItemStack[] items) {
             this(items, 0f);
         }
@@ -95,4 +94,5 @@ public class CreatorsRecipe {
             this(0f);
         }
     }
+
 }

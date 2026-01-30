@@ -1,6 +1,7 @@
 package CtCoreSystem.CoreSystem.type.MultiCrafter;
 
 /*选择多合成,无输出贴图显示*/
+import CtCoreSystem.CoreSystem.type.No9527.BlockTextRenderer;
 import arc.Core;
 import CtCoreSystem.CoreSystem.type.V8.ItemDisplay;
 import CtCoreSystem.CoreSystem.type.V8.ItemImage;
@@ -36,6 +37,7 @@ import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
 
 import static CtCoreSystem.CoreSystem.draw.CreatorsStyles.clearToggleTransi;
+import static CtCoreSystem.CtCoreSystem.方块贴图;
 import static arc.Core.bundle;
 import static arc.Core.scene;
 
@@ -248,8 +250,13 @@ public class CtMultiCrafters extends GenericCrafter {
         public float[] 加工时间 = new float[recs.length];
 
         @Override
-        public void draw(){
-            super.draw();
+        public void draw() {
+            if(方块贴图==true) {
+                drawer.draw(this);
+            }else {
+                // 使用工具类渲染方块文字
+                BlockTextRenderer.renderBlockText(x, y, localizedName, block.size);
+            }
         }
 
         @Override

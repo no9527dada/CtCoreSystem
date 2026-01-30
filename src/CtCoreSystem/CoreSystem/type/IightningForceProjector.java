@@ -39,6 +39,18 @@ public class IightningForceProjector extends ForceProjector {
             lightningLength = 6;
         }};
     }
+    public IightningForceProjector(String name) {
+        super(name);
+        radius = 30 * 8;
+        hasLiquids=false;
+        itemConsumer = new ConsumeItems() {{
+            //items = new Seq<>();
+        }};
+        bullet = new LightningBulletType() {{
+            damage = 伤害;
+            lightningLength = 6;
+        }};
+    }
     public void setStats() {
 
         super.setStats();

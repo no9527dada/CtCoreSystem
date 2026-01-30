@@ -406,7 +406,7 @@ public class TDBuffChange {
         @Override
         public boolean canBreak(Tile tile) {
             return Vars.state.rules.infiniteResources||!privileged || state.rules.editor || state.playtestingMap != null;
-        }
+        }//@world-switch
         public boolean 开关;
         public class 游戏环境光开关Build extends Building {
       @Override

@@ -1,5 +1,6 @@
 package CtCoreSystem.CoreSystem.type;
 
+import CtCoreSystem.mfxiao.激活进入;
 import arc.Core;
 import arc.Events;
 import arc.graphics.Color;
@@ -27,10 +28,10 @@ import arc.struct.ObjectMap;
 import arc.struct.ObjectSet;
 import arc.struct.Seq;
 import arc.util.*;
-import CtCoreSystem.ui.Award9527;
 import mindustry.content.TechTree;
 import mindustry.content.TechTree.TechNode;
 import mindustry.core.UI;
+import mindustry.game.EventType;
 import mindustry.game.EventType.ResearchEvent;
 import mindustry.game.Objectives.Objective;
 import mindustry.game.Objectives.Produce;
@@ -45,12 +46,14 @@ import mindustry.ui.Fonts;
 import mindustry.ui.ItemsDisplay;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
+import mindustry.ui.dialogs.ResearchDialog;
 import mindustry.ui.layout.BranchTreeLayout;
 import mindustry.ui.layout.TreeLayout.TreeNode;
 
 import java.util.Arrays;
 
-import static CtCoreSystem.CoreSystem.type.CTColor.C;
+import static CtCoreSystem.CoreSystem.type.CTColor.*;
+import static CtCoreSystem.CtCoreSystem.手机端;
 import static mindustry.Vars.*;
 import static mindustry.gen.Tex.buttonDown;
 import static mindustry.gen.Tex.buttonOver;
@@ -59,6 +62,7 @@ import static mindustry.gen.Tex.buttonOver;
 public class CTResearchDialog extends BaseDialog {
     public static boolean debugShowRequirements = false;
 
+    public static float 界面尺寸值 = 6000;
     public final float nodeSize = Scl.scl(60f);
     public ObjectSet<TechTreeNode> nodes = new ObjectSet<>();
     public TechTreeNode root = new TechTreeNode(TechTree.roots.first(), null);
@@ -66,13 +70,28 @@ public class CTResearchDialog extends BaseDialog {
     public Rect bounds = new Rect();
     public ItemsDisplay itemDisplay;
     public View view;
-
     public ItemSeq items;
-
     private boolean showTechSelect;
-    private Color 点亮颜色 = Color.valueOf("78ffab");
+    private Color 点亮线颜色 = Color.valueOf("ffdb57");
+    private Color 未点亮线颜色 = 灰色;
     private Color 进度字颜色 = Color.valueOf("f7e5a8");
     private Color 描述颜色 = Color.valueOf("c6bdfa");
+    private Color 资源满足时的文字颜色 = Color.valueOf("8fbb94");//淡暗绿色
+    private Color 资源不满足时的文字颜色 = Color.scarlet;//红色
+    private Color 即将点亮贴图颜色 = 暗绿色;
+    private Color 不可点亮贴图颜色 = 深灰色;
+    //缩放最小值和最大值 用于缩放科技树 上次值为0.1-32  原版初始值0.2-1
+    private float 缩放最小值 = 0.15f;
+    private float 缩放最大值 = 1.5f;
+    // 界面尺寸太大时 部分机型会卡
+    private Rect 界面尺寸 = new Rect(
+            手机端 ?-界面尺寸值*2:-界面尺寸值,
+            -界面尺寸值 + 3000,
+            手机端 ? 界面尺寸值 * 4 : 界面尺寸值 * 2,
+            界面尺寸值 * 1
+    );
+    // 在构造函数或类开始处添加
+    private float 边界放大系数 = 2f;
 
     public CTResearchDialog() {
         super("");
@@ -207,7 +226,7 @@ public class CTResearchDialog extends BaseDialog {
         addCloseButton();
 
         keyDown(key -> {
-            if(key == Binding.research.value.key){
+            if (key == Binding.research.value.key) {
                 Core.app.post(this::hide);
             }
         });
@@ -219,7 +238,7 @@ public class CTResearchDialog extends BaseDialog {
 
         buttons.button(Core.bundle.format("love9527"), () -> {
             hide();
-            new Award9527().show();
+            new 激活进入().show();
 
         }).size(150f, 64f).name("database").update(i ->
                 i.getLabel().setColor(new Color().set(Color.white).lerp(C("fd5bff"),
@@ -230,7 +249,7 @@ public class CTResearchDialog extends BaseDialog {
         addListener(new InputListener() {
             @Override
             public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY) {
-                view.setScale(Mathf.clamp(view.scaleX - amountY / 10f * view.scaleX, 0.1f, 32f));
+                view.setScale(Mathf.clamp(view.scaleX - amountY / 10f * view.scaleX, 缩放最小值, 缩放最大值));
                 view.setOrigin(Align.center);
                 view.setTransform(true);
                 return true;
@@ -252,7 +271,7 @@ public class CTResearchDialog extends BaseDialog {
                     view.lastZoom = view.scaleX;
                 }
 
-                view.setScale(Mathf.clamp(distance / initialDistance * view.lastZoom, 0.1f, 32f));
+                view.setScale(Mathf.clamp(distance / initialDistance * view.lastZoom, 缩放最小值, 缩放最大值));
                 view.setOrigin(Align.center);
                 view.setTransform(true);
             }
@@ -302,47 +321,56 @@ public class CTResearchDialog extends BaseDialog {
     }
 
     void treeLayout() {
-        float spacing = 20f;
-        LayoutNode node = new LayoutNode(root, null);
-        LayoutNode[] children = node.children;
-        LayoutNode[] leftHalf = Arrays.copyOfRange(node.children, 0, Mathf.ceil(node.children.length / 2f));
-        LayoutNode[] rightHalf = Arrays.copyOfRange(node.children, Mathf.ceil(node.children.length / 2f), node.children.length);
+    float spacing = 20f;
+    LayoutNode node = new LayoutNode(root, null);
+    LayoutNode[] children = node.children;
+    LayoutNode[] leftHalf = Arrays.copyOfRange(node.children, 0, Mathf.ceil(node.children.length / 2f));
+    LayoutNode[] rightHalf = Arrays.copyOfRange(node.children, Mathf.ceil(node.children.length / 2f), node.children.length);
 
-        node.children = leftHalf;
+    node.children = leftHalf;
+    new BranchTreeLayout() {{
+        gapBetweenLevels = gapBetweenNodes = spacing;
+        rootLocation = TreeLocation.top;
+    }}.layout(node);
+
+    float lastY = node.y;
+
+    if (rightHalf.length > 0) {
+        node.children = rightHalf;
         new BranchTreeLayout() {{
             gapBetweenLevels = gapBetweenNodes = spacing;
-            rootLocation = TreeLocation.top;
+            rootLocation = TreeLocation.bottom;
         }}.layout(node);
 
-        float lastY = node.y;
-
-        if (rightHalf.length > 0) {
-
-            node.children = rightHalf;
-            new BranchTreeLayout() {{
-                gapBetweenLevels = gapBetweenNodes = spacing;
-                rootLocation = TreeLocation.bottom;
-            }}.layout(node);
-
-            shift(leftHalf, node.y - lastY);
-        }
-
-        node.children = children;
-
-        float minx = 0f, miny = 0f, maxx = 0f, maxy = 0f;
-        copyInfo(node);
-
-        for (TechTreeNode n : nodes) {
-            if (!n.visible) continue;
-            minx = Math.min(n.x - n.width / 2f, minx);
-            maxx = Math.max(n.x + n.width / 2f, maxx);
-            miny = Math.min(n.y - n.height / 2f, miny);
-            maxy = Math.max(n.y + n.height / 2f, maxy);
-        }
-       bounds = new Rect(-9999, -9999, 9999*2, 9999*2);
-       // bounds = new Rect(minx, miny, maxx - minx, maxy - miny);
-        bounds.y += nodeSize * 1.5f;
+        shift(leftHalf, node.y - lastY);
     }
+
+    node.children = children;
+
+    float minx = 0f, miny = 0f, maxx = 0f, maxy = 0f;
+    copyInfo(node);
+
+    for (TechTreeNode n : nodes) {
+        if (!n.visible) continue;
+        minx = Math.min(n.x - n.width / 2f, minx);
+        maxx = Math.max(n.x + n.width / 2f, maxx);
+        miny = Math.min(n.y - n.height / 2f, miny);
+        maxy = Math.max(n.y + n.height / 2f, maxy);
+    }
+      //  this.bounds = new Rect(minx, miny, maxx - minx, maxy - miny);//原版的
+        this.bounds = new Rect(
+                minx * 边界放大系数,
+                miny * 边界放大系数,
+                (maxx - minx) * 边界放大系数,
+                (maxy - miny) * 边界放大系数
+        );
+        this.bounds.y += this.nodeSize * 1.5F;
+
+        //使用下面注释的固定值会导致每次研究项目后界面偏移
+   // bounds = 界面尺寸;
+   // bounds.y = 界面尺寸.y + nodeSize * 1.5f;
+}
+
 
     void shift(LayoutNode[] children, float amount) {
         for (LayoutNode node : children) {
@@ -477,8 +505,9 @@ public class CTResearchDialog extends BaseDialog {
                     button.getStyle().up = !locked(node.node) ? Tex.buttonOver : !selectable(node.node) || !canSpend(node.node) ? Tex.buttonRed : Tex.button;
 
                     ((TextureRegionDrawable) button.getStyle().imageUp).setRegion(node.node.content.uiIcon);
-                    button.getImage().setColor(Color.white);
+                    button.getImage().setColor(!locked(node.node) ? Color.white : node.selectable ? 即将点亮贴图颜色 : 不可点亮贴图颜色);
                     button.getImage().setScaling(Scaling.bounded);
+
                 });
                 addChild(button);
             }
@@ -567,8 +596,22 @@ public class CTResearchDialog extends BaseDialog {
             rebuild(shine);
             itemDisplay.rebuild(items, usedShine);
         }
+        void unlock(TechTree.TechNode node) {
+            node.content.unlock();
 
-        void unlock(TechNode node) {
+            for(TechTree.TechNode parent = node.parent; parent != null; parent = parent.parent) {
+                parent.content.unlock();
+            }
+
+            CTResearchDialog.this.checkNodes(CTResearchDialog.this.root);
+            this.hoverNode = null;
+            CTResearchDialog.this.treeLayout();
+            this.rebuild();
+            Core.scene.act();
+            Sounds.uiUnlock.play();
+            Events.fire(new EventType.ResearchEvent(node.content));
+        }
+      /*  void unlock(TechNode node) {
             node.content.unlock();
 
             //unlock parent nodes in multiplayer.
@@ -583,9 +626,46 @@ public class CTResearchDialog extends BaseDialog {
             treeLayout();
             rebuild();
             Core.scene.act();
-            Sounds.unlock.play();
+            Sounds.uiUnlock.play();
             Events.fire(new ResearchEvent(node.content));
         }
+       void unlock(TechNode node) {
+    // 保存当前视图位置
+    float savedPanX = view.panX;
+    float savedPanY = view.panY;
+    float savedScale = view.scaleX;
+
+    node.content.unlock();
+
+    // 解锁父节点
+    TechNode parent = node.parent;
+    while (parent != null) {
+        parent.content.unlock();
+        parent = parent.parent;
+    }
+
+    checkNodes(root);
+
+    // 重建布局
+    treeLayout();
+
+    // 重建视图
+    view.rebuildAll();
+
+    // 恢复之前的位置和缩放
+    view.panX = savedPanX;
+    view.panY = savedPanY;
+    view.setScale(savedScale);
+
+    // 确保变换仍然启用
+    view.setTransform(true);
+    view.setOrigin(Align.center);
+
+    Core.scene.act();
+    Sounds.uiUnlock.play();
+    Events.fire(new ResearchEvent(node.content));
+}*/
+
 
         void rebuild() {
             rebuild(null);
@@ -675,7 +755,7 @@ public class CTResearchDialog extends BaseDialog {
                                                 UI.formatAmount(Math.min(items.get(req.item), reqAmount)) + " / "
                                                 + UI.formatAmount(reqAmount)).get();
 
-                                        Color targetColor = items.has(req.item) ? Color.lightGray : Color.scarlet;
+                                        Color targetColor = items.has(req.item) ? 资源满足时的文字颜色 : 资源不满足时的文字颜色;
 
                                         if (shiny) {
                                             label.setColor(Pal.accent);
@@ -757,7 +837,7 @@ public class CTResearchDialog extends BaseDialog {
                     boolean lock = locked(node.node) || locked(child.node);
                     Draw.z(lock ? 1f : 2f);
 
-                    Lines.stroke(Scl.scl(4f), lock ? Color.scarlet : 点亮颜色);
+                    Lines.stroke(Scl.scl(4f), lock ? 未点亮线颜色 : 点亮线颜色);
                     Draw.alpha(parentAlpha);
                     if (Mathf.equal(Math.abs(node.y - child.y), Math.abs(node.x - child.x), 1f) && Mathf.dstm(node.x, node.y, child.x, child.y) <= node.width * 3) {
                         Lines.line(node.x + offsetX, node.y + offsetY, child.x + offsetX, child.y + offsetY);
