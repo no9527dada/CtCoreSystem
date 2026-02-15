@@ -12,7 +12,6 @@ import arc.util.Align;
 import arc.util.Log;
 import arc.util.Reflect;
 import arc.util.Time;
-import creators.Creators;
 import mindustry.Vars;
 import mindustry.core.UI;
 import mindustry.game.EventType;
@@ -29,9 +28,11 @@ import static CtCoreSystem.CtCoreSystem.方块贴图;
 import static CtCoreSystem.CtURL.QQ群2;
 import static CtCoreSystem.CtURL.视频教程;
 import static mindustry.gen.Call.sendChatMessage;
+
 public class 游戏功能按钮 {
     // 添加单位贴图开关方法
     private int currentTeamMode = 0; // 0: none, 1: crux, 2: sharded, 3: all
+
     // 添加游戏变速方法
     private void setupSpeedTable(Table table) {
         // 定义速度颜色
@@ -108,7 +109,7 @@ public class 游戏功能按钮 {
             clearAllUnitsFromDrawGroup();
 
             // 根据选择的模式显示对应队伍的单位
-           switch (currentTeamMode) {
+            switch (currentTeamMode) {
                 case 0:// all 显示全部
                     // 遍历Team.all数组中的所有队伍，而不是尝试直接获取Team.all
                     for (Team team : Team.all) {
@@ -121,11 +122,11 @@ public class 游戏功能按钮 {
                     Vars.state.teams.get(Team.sharded).units.each(unit -> Groups.draw.add(unit));
                     break;
                 case 2://显示 crux (红队)
-                        Vars.state.teams.get(Team.crux).units.each(unit -> Groups.draw.add(unit));
+                    Vars.state.teams.get(Team.crux).units.each(unit -> Groups.draw.add(unit));
                     break;
                 case 3: //全隐藏
                     break;
-           }
+            }
             /*switch (currentTeamMode) {
                 case 0:// all 显示全部
                     for (Team team : Team.all) {
@@ -261,12 +262,17 @@ public class 游戏功能按钮 {
                     // 蓝图按钮
                     if (Vars.mods.getMod("creators") != null) {
                         buttons.button(Icon.book, Styles.clearTogglei, () -> {
-                            Creators.CTBlockBool = !Creators.CTBlockBool;
+                            try {//set block state via reflect
+                                boolean bool = Reflect.get(Class.forName("Creators"), "CTBlockBool");
+                                Reflect.set(Class.forName("Creators"), "CTBlockBool", !bool);
+                            } catch (Exception ignored) {
+                            }
+//                            Creators.CTBlockBool = !Creators.CTBlockBool;
                         }).size(46).tooltip(Core.bundle.get("9527lantu")).padRight(4);
                     }
                     // 方块贴图按钮
                     buttons.button(Icon.eye, Styles.clearTogglei, () -> {
-                        方块贴图=!方块贴图;
+                        方块贴图 = !方块贴图;
                     }).size(46).tooltip(Core.bundle.get("NOFFs")).padRight(4);
 
                     // 全局特效开关
@@ -284,7 +290,7 @@ public class 游戏功能按钮 {
                     buttons.button(Icon.info, kaite, () -> {
                         // 资源统计路径：CT3PlanetDialog.showStats(Vars.state.getSector());
                         Sector sector = Vars.state.getSector();
-                      if (sector != null && sector.save != null) {
+                        if (sector != null && sector.save != null) {
                             Reflect.invoke(Vars.ui.planet, "showStats", new Object[]{sector}, Sector.class);
                         }
                     }).size(46).tooltip(Core.bundle.get("tongji")).padRight(4);

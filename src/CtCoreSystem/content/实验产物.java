@@ -20,7 +20,6 @@ import mindustry.world.blocks.defense.turrets.PowerTurret;
 import mindustry.world.meta.BlockGroup;
 import mindustry.world.meta.BuildVisibility;
 
-import static creators.CTItem.tanban;
 
 public class 实验产物 {
 
