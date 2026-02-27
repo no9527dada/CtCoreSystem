@@ -46,7 +46,8 @@ public class CT3LaserBulletType extends ContinuousLaserBulletType {
     @Override
     public void update(Bullet b) {
         float realLength = Damage.findLaserLength(b, length);
-        float fout = Mathf.clamp(b.time > b.lifetime - fadeTime ? 1f - (b.time - (lifetime - fadeTime)) / fadeTime : 1f);
+        //float fout = Mathf.clamp(b.time > b.lifetime - fadeTime ? 1f - (b.time - (lifetime - fadeTime)) / fadeTime : 1f);
+        float fout =1f;
         float baseLen = realLength * fout;
 
         Tmp.v1.trns(b.rotation(), baseLen);

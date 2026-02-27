@@ -74,7 +74,7 @@ public class CreatorsUnitFactory extends UnitBlock {
         rotate = true;
         regionRotated1 = 1;
         commandable = true;
-        ambientSound = Sounds.respawning;
+        ambientSound = Sounds.loopUnitBuilding;
 
         config(Integer.class, (CreatorsUnitFactoryBuild tile, Integer i) -> {
             if (!configurable) return;

@@ -2,9 +2,13 @@ package CtCoreSystem.CoreSystem.type.Ovulam5480;
 
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.Fill;
+import arc.graphics.g2d.Lines;
+import arc.math.Mathf;
 import arc.math.geom.Geometry;
 import arc.struct.Seq;
 import arc.util.Eachable;
+import arc.util.Time;
 import mindustry.Vars;
 import mindustry.content.Blocks;
 import mindustry.content.Items;
@@ -13,6 +17,8 @@ import mindustry.entities.units.BuildPlan;
 import mindustry.game.Team;
 import mindustry.gen.Building;
 import mindustry.graphics.Drawf;
+import mindustry.graphics.Layer;
+import mindustry.type.Item;
 import mindustry.world.Block;
 import mindustry.world.Tile;
 import mindustry.world.blocks.environment.Floor;
@@ -22,18 +28,19 @@ import static mindustry.Vars.world;
 public class ReclamationBlock extends Block {
     public float 资源数量 ;
     public Seq<Floor> targets = Vars.content.blocks().select(f -> f instanceof Floor ff && ff.liquidDrop == Liquids.water).as();
-    public Floor floor = Blocks.darksand.asFloor();
+    public Floor floor = Blocks.taintedWater.asFloor();
     public int targetSize = 1;
 
-    public ReclamationBlock(String name) {
+    public ReclamationBlock(String name, Item item) {
         super(name);
         rotate = true;
         update = true;
         solid = true;
         consumesPower = true;
+        rebuildable = false;//是否可以被自动重建
         资源数量=120;//每帧会消耗1个，当消耗数量达到【资源数量】时完成填海操作
-        consumeItem(Items.sand, 1);//这里是每帧消耗多少个资源 一般不用改
         consumePower(1f);//每秒消耗电力
+        consumeItem(item, 1);//这里是每帧消耗多少个资源 一般不用改
         size = 2;
     }
     @Override
@@ -116,10 +123,6 @@ public class ReclamationBlock extends Block {
 
     public class ReclamationBlockBuild extends Building {
         float timer;
-
-
-
-
         @Override
         public void updateTile() {
             // 检查电力和物品是否充足
@@ -133,6 +136,46 @@ public class ReclamationBlock extends Block {
                     if(targets.contains(t.floor()))t.setFloor(floor);
                 });
                 damage(Float.MAX_VALUE);
+            }
+        }
+        @Override
+        public void draw() {
+            super.draw();
+
+            // 当区块工作时绘制特效
+            if (efficiency >= 1) {
+                float progress = Math.min(timer / 资源数量, 1f);
+
+                // 绘制脉动光环
+                Draw.z(Layer.effect);
+                Draw.color(Color.blue, Color.cyan, progress);
+                Draw.alpha(0.6f + Mathf.absin(Time.time, 1f, 0.4f));
+                Lines.circle(x, y, (size * Vars.tilesize / 2f) + Mathf.absin(Time.time, 2f, 2f) + progress * 4f);
+
+                // 绘制中心发光
+                Draw.color(Color.cyan);
+                Draw.alpha(0.8f);
+               Fill.circle(x, y, (size * Vars.tilesize / 4f) + Mathf.absin(Time.time, 1.5f, 1f));
+
+                // 绘制进度光环
+                Draw.color(Color.green);
+                Draw.alpha(0.5f);
+                Lines.arc(x, y, (size * Vars.tilesize / 2f) + 8f, 0, progress * 360f);
+
+                // 重置绘制状态
+                Draw.color();
+            }
+        }
+
+        @Override
+        public void drawLight() {
+            super.drawLight();
+
+            // 工作时添加更强的光源
+            if (efficiency >= 1) {
+                float progress = Math.min(timer / 资源数量, 1f);
+                float lightRadius = (size * Vars.tilesize) + progress * 32f;
+                Drawf.light(x, y, lightRadius, Color.cyan, 0.6f);
             }
         }
     }

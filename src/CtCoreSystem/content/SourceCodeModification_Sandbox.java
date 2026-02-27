@@ -126,13 +126,6 @@ public class SourceCodeModification_Sandbox {
         地图炸档器 = new BufferedItemBridge("breakdown") {
             {
                 requirements(Category.effect, BuildVisibility.editorOnly, with(物品, 1));
-                health = 100;
-                envEnabled = Env.any;
-                itemCapacity =
-                        range = 0;
-                bufferCapacity = 0;
-                targetable =
-                        solid = false;
                 buildType = Build::new;
 
             }
@@ -812,11 +805,6 @@ public class SourceCodeModification_Sandbox {
                 envEnabled = Env.any;
             }
         };
-        填海器 = new ReclamationBlock("填海器") {{
-            requirements(Category.crafting, BuildVisibility.sandboxOnly, with(物品, 1));
-            envEnabled = Env.any;
-            targetSize = 8;
-        }};
     }
 
 

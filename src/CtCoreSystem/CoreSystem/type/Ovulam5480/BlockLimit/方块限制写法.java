@@ -2,6 +2,7 @@ package CtCoreSystem.CoreSystem.type.Ovulam5480.BlockLimit;
 
 
 import CtCoreSystem.CoreSystem.type.LYBF.factory.CoreGenericCrafter;
+import CtCoreSystem.CoreSystem.type.No9527.建筑贴图隐藏.*;
 import arc.Core;
 import mindustry.Vars;
 import mindustry.game.Team;
@@ -99,7 +100,7 @@ public class 方块限制写法 {
 
 
     //普通工厂
-    public static class 工厂数量限制GenericCrafter extends GenericCrafter {
+    public static class 工厂数量限制GenericCrafter extends newGenericCrafter {
         //  数字代表允许建筑的数量，最多是数字的值+1
 
 

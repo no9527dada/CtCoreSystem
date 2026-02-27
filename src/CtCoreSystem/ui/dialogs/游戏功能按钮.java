@@ -1,6 +1,6 @@
 package CtCoreSystem.ui.dialogs;
 
-import CtCoreSystem.ui.CTui;
+
 import arc.Core;
 import arc.Events;
 import arc.graphics.Color;
@@ -9,6 +9,7 @@ import arc.scene.ui.Label;
 import arc.scene.ui.Slider;
 import arc.scene.ui.layout.Table;
 import arc.util.Align;
+import arc.util.Log;
 import arc.util.Reflect;
 import arc.util.Time;
 import creators.Creators;
@@ -24,12 +25,13 @@ import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 
 import static CtCoreSystem.CtCoreSystem.加载CTTD;
+import static CtCoreSystem.CtCoreSystem.方块贴图;
 import static CtCoreSystem.CtURL.QQ群2;
+import static CtCoreSystem.CtURL.视频教程;
 import static mindustry.gen.Call.sendChatMessage;
 public class 游戏功能按钮 {
     // 添加单位贴图开关方法
     private int currentTeamMode = 0; // 0: none, 1: crux, 2: sharded, 3: all
-
     // 添加游戏变速方法
     private void setupSpeedTable(Table table) {
         // 定义速度颜色
@@ -55,7 +57,7 @@ public class 游戏功能按钮 {
             // 只在联机模式下，并且是主机时发送聊天消息 防止客机刷屏
             if (Vars.net.active() && Vars.net.server()) {
                 // 向聊天框发送消息：房主已将游戏速度调至X倍
-                sendChatMessage("[yellow]我已将游戏速度调至" + speed + "倍");
+                sendChatMessage("[yellow]房主将游戏速度调至" + speed + "倍");
             }
         });
 
@@ -123,7 +125,7 @@ public class 游戏功能按钮 {
                     break;
                 case 3: //全隐藏
                     break;
-            }
+           }
             /*switch (currentTeamMode) {
                 case 0:// all 显示全部
                     for (Team team : Team.all) {
@@ -216,17 +218,17 @@ public class 游戏功能按钮 {
                     buttonn.setText(Core.bundle.get("jiesuan") + UI.formatTime(ticks));
                 });
                 e.row();
-                e.button("@tongji2", Icon.info, () -> {
+            /*    e.button("@tongji2", Icon.info, () -> {//资源统计 154版本报错
                     Sector sector = Vars.state.getSector();
                     if (sector != null && sector.save != null) {
                         Reflect.invoke(CTui.CTplanet, "showStats", new Object[]{Vars.state.getSector()}, Sector.class);
                         // CTui.CTplanet, "showStats", [Vars.state.getSector()], Sector
                     }
-                }).size(250, 64).padLeft(-400).padTop(20);
+                }).size(250, 64).padLeft(-400).padTop(20);*/
                 e.button(Core.bundle.format("gonglue"), () -> {
-                    if (!Core.app.openURI(QQ群2)) {
+                    if (!Core.app.openURI(视频教程)) {
                         Vars.ui.showErrorMessage("@linkfail");
-                        Core.app.setClipboardText(QQ群2);
+                        Core.app.setClipboardText(视频教程);
                     }
                 }).size(250, 64).padLeft(-400).padTop(20);
             })).grow().center().maxWidth(770);
@@ -262,6 +264,10 @@ public class 游戏功能按钮 {
                             Creators.CTBlockBool = !Creators.CTBlockBool;
                         }).size(46).tooltip(Core.bundle.get("9527lantu")).padRight(4);
                     }
+                    // 方块贴图按钮
+                    buttons.button(Icon.eye, Styles.clearTogglei, () -> {
+                        方块贴图=!方块贴图;
+                    }).size(46).tooltip(Core.bundle.get("NOFFs")).padRight(4);
 
                     // 全局特效开关
                     buttons.button(Icon.eye, Styles.clearTogglei, () -> {
@@ -269,15 +275,16 @@ public class 游戏功能按钮 {
                         Core.settings.put("effects", !currentValue);
                     }).size(46).tooltip(Core.bundle.get("NOFF")).padRight(4);
 
-                    // 后台结算按钮
+                   /* // 后台结算按钮  已经整合到资源统计ui中
                     buttons.button(Icon.save, kaite, () -> {
                         locloseAnAccounve.show();
-                    }).size(46).tooltip(Core.bundle.get("jiesuan")).padRight(4);
+                    }).size(46).tooltip(Core.bundle.get("jiesuan")).padRight(4);*/
 
                     // 统计按钮
                     buttons.button(Icon.info, kaite, () -> {
+                        // 资源统计路径：CT3PlanetDialog.showStats(Vars.state.getSector());
                         Sector sector = Vars.state.getSector();
-                        if (sector != null && sector.save != null) {
+                      if (sector != null && sector.save != null) {
                             Reflect.invoke(Vars.ui.planet, "showStats", new Object[]{sector}, Sector.class);
                         }
                     }).size(46).tooltip(Core.bundle.get("tongji")).padRight(4);

@@ -6,39 +6,30 @@ import CtCoreSystem.CoreSystem.miner.minerRenderer;
 import CtCoreSystem.CoreSystem.type.CTResearchDialog;
 import CtCoreSystem.CoreSystem.type.No9527.Cursor;
 import CtCoreSystem.CoreSystem.type.No9527.Cursor0;
-import CtCoreSystem.CoreSystem.type.No9527.ZiTi;
 import CtCoreSystem.CoreSystem.type.Ovulam5480.xuetiao.BossBarFragment;
 import CtCoreSystem.CoreSystem.type.VXV.SpawnDraw;
-import CtCoreSystem.content.CTFragShader;
+import CtCoreSystem.content.*;
 import CtCoreSystem.content.Effect.CT3FxEffect;
 import CtCoreSystem.content.Effect.NewFx;
-import CtCoreSystem.content.ItemX;
-import CtCoreSystem.content.SourceCodeModification_Sandbox;
-import CtCoreSystem.content.yuanban;
 import CtCoreSystem.mfxiao.ActivateProgram;
+import CtCoreSystem.mfxiao.RSAEncryptionUtil;
+import CtCoreSystem.mfxiao.激活进入;
 import CtCoreSystem.ui.NanDu.CTCampaignRulesDialog;
 import CtCoreSystem.ui.CTGalaxyAcknowledgments;
 import CtCoreSystem.ui.CTPlacementFragment;
 import CtCoreSystem.ui.Ovulam5480.资源顶部显示;
-import CtCoreSystem.ui.UnemFragment;
 import CtCoreSystem.ui.dialogs.CT3InfoDialog;
 import CtCoreSystem.ui.dialogs.CT3PlanetDialog;
 import CtCoreSystem.ui.dialogs.CT3function;
 import CtCoreSystem.ui.dialogs.游戏功能按钮;
 import arc.Core;
 import arc.Events;
-import arc.Graphics;
 import arc.graphics.Color;
-import arc.graphics.Pixmap;
-import arc.graphics.Pixmaps;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.TextureRegion;
 import arc.input.KeyCode;
-import arc.math.Mathf;
-import arc.scene.ui.Dialog;
-import arc.scene.ui.ImageButton;
+import arc.scene.ui.*;
 import arc.scene.ui.layout.Collapser;
-import arc.scene.ui.layout.Scl;
 import arc.scene.ui.layout.Table;
 import arc.struct.ObjectSet;
 import arc.struct.Seq;
@@ -46,16 +37,13 @@ import arc.util.*;
 import mindustry.Vars;
 import mindustry.game.EventType;
 import mindustry.game.Team;
-import mindustry.gen.Call;
-import mindustry.gen.Icon;
-import mindustry.gen.Tex;
+import mindustry.gen.*;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Shaders;
 import mindustry.mod.Mod;
 import mindustry.mod.Mods;
 import mindustry.type.Planet;
 import mindustry.type.UnitType;
-import mindustry.ui.Fonts;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 import mindustry.ui.dialogs.PlanetDialog;
@@ -74,22 +62,30 @@ import java.util.function.Consumer;
 import static CtCoreSystem.CoreSystem.type.VXV.TDpowerShowBlock.TDloadPowerShow;
 import static CtCoreSystem.CoreSystem.type.VXV.powerShowBlock.loadPowerShow;
 import static CtCoreSystem.mfxiao.ActivateProgram.startActivationProcess;
+import static CtCoreSystem.ui.dialogs.ggg.inits;
 import static arc.Core.camera;
 import static arc.Core.settings;
 import static mindustry.Vars.*;
-
-public class CtCoreSystem extends Mod {
+import java.text.SimpleDateFormat;
+import java.util.Date;
+public class CtCoreSystem<let> extends Mod {
     public final static Seq<Runnable> BlackListRun = new Seq<>();
     public static BossBarFragment bossBar;
     public static boolean cthind = settings.getBool("辅助模式", false);
     public static boolean 主动关闭激活 = Core.settings.getBool("主动关闭激活", false);
     public static boolean 科技树全显开关 = Core.settings.getBool("科技树全显开关", true);
     public static boolean 炫彩光标 = Core.settings.getBool("炫彩光标开关", false);
+    public static boolean 修复超速仪范围显示开关 = Core.settings.getBool("修复超速仪范围显示开关", false);
+    public static boolean  方块贴图 = Core.settings.getBool("方块贴图", true);
+    public static boolean 禁用建筑红叉 = Core.settings.getBool("禁用建筑红叉", false);
+    public static boolean 敌人行进路径 = Core.settings.getBool("敌人行进路径", false);
+   // public static boolean 强制ui缩放 = Core.settings.getBool("强制ui缩放", false);
     public Seq<String> BaiMingDan = new Seq<>();
     public static String toText(String str) {
         return Core.bundle.format(str);
     }
     // 获取屏幕宽度
+
     public static int screenWidth = Core.graphics.getWidth();
     // 获取屏幕高度
     public static int screenHeight = Core.graphics.getHeight();
@@ -106,13 +102,24 @@ public class CtCoreSystem extends Mod {
     }
 
     {
-       if(手机端) {
-           // 设置手机端UI初始缩放比例为75%（即0.75倍）
-           Events.run(EventType.Trigger.update, () -> {
-               Core.settings.put("uiscale", 75);
-               Scl.setProduct(Math.max(Core.settings.getInt("uiscale", 100), 25) / 100f);
-           });
-        }
+        //获取当前系统时间 包括年月日 时分秒
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String currentTime = sdf.format(new Date());
+        Log.info("当前日志生成时间: " + currentTime);
+
+/*
+        if (强制ui缩放=true){
+           // if (手机端) {
+                // 设置手机端UI初始缩放比例为75%（即0.75倍）
+                Events.run(EventType.Trigger.update, () -> {
+                    Core.settings.put("uiscale", 75);
+                    Scl.setProduct(Math.max(Core.settings.getInt("uiscale", 100), 25) / 100f);
+                });
+           // }
+        }*/
+
+
+
         //  Vars.state.rules.alloweditworldprocessors=false; 禁止世处编辑
         Vars.state.rules.hideBannedBlocks = false;
         //缩放
@@ -122,10 +129,8 @@ public class CtCoreSystem extends Mod {
         Vars.maxSchematicSize = 128;
     }
 
-
-
     public CtCoreSystem() {
-
+        CT3禁用建筑红叉显示();
    /*
     //全队开启无限火力
     for (Team team : Team.all) {
@@ -133,26 +138,35 @@ public class CtCoreSystem extends Mod {
                 Vars.state.rules.teams.get(team).cheat = true;
             }
         }*/
-
+        CT3禁用建筑红叉显示();
         //带桥物品显示
         Events.on(EventType.ClientLoadEvent.class, (e) -> {
             minerRenderer.init();
-
         });
         Events.run(EventType.Trigger.draw, minerRenderer::draw);
-
         //进攻模式下执行红队满仓资源
         Events.on(EventType.WorldLoadEvent.class, (e) -> {
             if (Vars.state.rules.attackMode) {
                 Vars.state.rules.teams.get(Team.crux).fillItems = true;
             }
         });
-
+    }
+    // 禁用建筑红叉显示
+    public void CT3禁用建筑红叉显示() {
+        Events.run(EventType.Trigger.draw, () -> {
+            if (禁用建筑红叉) {
+                Vars.indexer.eachBlock(null, Core.camera.position.x, Core.camera.position.y, 240.0F, (b) -> true, (b) -> {
+                    if (!b.enabled && b.block.drawDisabled) {
+                        Draw.z(31.0F);
+                        b.drawDisabled();
+                    }
+                });
+            }
+        });
     }
 
-
     public void loadContent() {
-        //实验产物.load();
+     // 实验产物.load();
 
         //字体
   /*              try {
@@ -163,7 +177,6 @@ public class CtCoreSystem extends Mod {
 
         if (!cthind) {
             Vars.mods.getMod("ctcoresystem").meta.hidden = false;
-
         } else {
             Vars.mods.getMod("ctcoresystem").meta.hidden = true;
         }
@@ -179,6 +192,7 @@ public class CtCoreSystem extends Mod {
         yuanban.load();
         SourceCodeModification_Sandbox.load();
         // }
+     //实验产物.load();
         CreatorsModJS.DawnMods();//JS加载器
     /*
    //分类栏ui
@@ -196,6 +210,17 @@ public class CtCoreSystem extends Mod {
     }
 
     public void init() {
+
+        if(加载CT2()){
+            // 玩家进入房间事件
+            Events.on(EventType.PlayerJoin.class, (e) -> {
+                Call.sendMessage("[lightgray]" + e.player.name + "[yellow]" + toText("joined"));
+            });
+            // 玩家离开房间事件
+            Events.on(EventType.PlayerLeave.class, (e) -> {
+                Call.sendMessage("[lightgray]" + e.player.name + "[yellow]" + toText("left"));
+            });
+        }
         new 游戏功能按钮().addToHud();
 
         if( 加载CT2()){
@@ -206,7 +231,8 @@ public class CtCoreSystem extends Mod {
             if (主动关闭激活 == false) {
                 Log.info("本地许可证验证中....");
                 if (ActivateProgram.LICENSE_FILE.exists()) {
-                    String licenseKey = ActivateProgram.LICENSE_FILE.readString().trim();
+                    startActivationProcess();//联网验证激活状态
+                   /* String licenseKey = ActivateProgram.LICENSE_FILE.readString().trim();
                     Log.info("本地许可证文件存在");
                     if (!licenseKey.isEmpty()) {
                         //  onActivationSuccess(); // 设置激活状态
@@ -218,31 +244,67 @@ public class CtCoreSystem extends Mod {
                         PopUpWindow("", cont -> {
                             cont.add(Core.bundle.format("activation.error.localfileinvalid"));
                         });
-                    }
+                    }*/
                 }else {
                     Log.info("本地许可证文件不存在1");
                     ActivateProgram.isActivated = false;
                     ActivateProgram.saveActivationState(); // 新增：保存激活状态
                 }
             }
-        });
+ });
+
         boolean[] 光标开关 = {false};
         boolean[] 辅助开关 = {false};
+        boolean[] ui缩放 = {false};
+
         ui.settings.addCategory("[accent][创世神][]辅助模式", Icon.chartBar, st -> {
+
             st.checkPref("辅助模式", false, e -> {
                 辅助开关[0] = !辅助开关[0];
             });
             st.checkPref("科技树全显开关", true, e -> {
                 科技树全显开关 = !科技树全显开关;
             });
-
+            st.checkPref("修复超速仪范围显示开关", true, e -> {
+                修复超速仪范围显示开关 = !修复超速仪范围显示开关;
+            });
+            st.checkPref("禁用建筑红叉", false, e -> {
+                禁用建筑红叉 = !禁用建筑红叉;
+            });
+            st.checkPref("敌人行进路径", true, e -> {
+                敌人行进路径 = !敌人行进路径;
+            });
+            if (!手机端) {
                 st.checkPref("炫彩光标开关", false, e -> {
                     光标开关[0] = !光标开关[0];
                 });
+            }
+            st.row();
+            st.button("主动关闭激活", (() -> {
+                激活进入.show();
+                ui.settings.hide();
+            })).width(250).height(50).row();
 
+     /*     if(手机端){
+                st.checkPref("强制ui缩放", true, e -> {
+                    ui缩放[0] = !ui缩放[0];
+                });
+          }*/
+            st.row();
+            //创作者生成激活码按钮
+            if( Vars.mods.locateMod("creatorsjihuoma") != null){
+                st.button("生成激活码", (() -> {
+                    RSAEncryptionUtil.showCreatorKeyGenerator();
+                    ui.settings.hide();
+                })) .width(300).height(50).row();
+            }
+            st.button("模组推荐", (() -> {
+                inits();
+            })) .width(300).height(50).row();
             st.row();
             st.add(Core.bundle.format("ct3-hind")).visible(() -> 辅助开关[0]).row();
             st.add(Core.bundle.format("ct3-hind")).visible(() -> 光标开关[0]).row();
+             st.add(Core.bundle.format("ct3-hind")).visible(() -> ui缩放[0]).row();
             st.add(Core.bundle.format("ct3-tree1")).visible(() -> !科技树全显开关).row();
             st.add(Core.bundle.format("ct3-tree2")).visible(() -> 科技树全显开关).row();
             st.image().color(Color.valueOf("69dcee")).fillX().height(3).pad(3).row();
@@ -359,10 +421,25 @@ public class CtCoreSystem extends Mod {
                     资源显示.resetUsed();
 	            });
 
-                //动态logo
+      /*          //动态logo
                 UnemFragment unemFragment = new UnemFragment();
                 Vars.ui.menufrag = unemFragment;
-                unemFragment.build(ui.menuGroup);
+                unemFragment.build(ui.menuGroup);*/
+
+                //获取当前已经加载的模组列表
+                StringBuilder modList = new StringBuilder();
+                boolean headless = Vars.headless;
+
+                for(Mods.LoadedMod mod : Vars.mods.list()){
+                    if(mod != null && mod.meta != null){
+                        // 检查模组是否启用
+                        if(!headless && Core.settings.getBool("mod-" + mod.meta.name + "-enabled", true)){
+                            if(modList.length() > 0) modList.append(", ");
+                            modList.append(mod.meta.displayName).append(" (").append(mod.meta.version).append(")");
+                        }
+                    }
+                }
+                Log.info("已经加载的模组: " + modList.toString());
             }
         }
 
@@ -387,12 +464,24 @@ public class CtCoreSystem extends Mod {
             });
         }
 
-        //区块名显示
-        Vars.ui.planet = new CT3PlanetDialog();
-        CT3InfoDialog.show();//开屏显示
-        CT3选择方块显示图标(); //选择方块显示图标
-   // ctUpdateDialog.load();//更新检测 新版 在用
 
+       Vars.ui.planet = new CT3PlanetDialog();     //区块名显示
+        CT3InfoDialog.show();//开屏显示
+       CT3选择方块显示图标(); //选择方块显示图标
+
+        if( Vars.mods.locateMod("creatorsjihuoma") == null) {
+            ctUpdateDialog.load();//更新检测 新版 在用
+        }
+
+
+        //覆盖原版难度选择
+        try {
+            Field field = PlanetDialog.class.getDeclaredField("campaignRules");
+            field.setAccessible(true);
+            field.set(ui.planet, new CTCampaignRulesDialog());
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
 
         // Timer.schedule(CTUpdater::checkUpdate, 4);//檢測更新 旧版 未用
 
@@ -409,22 +498,6 @@ public class CtCoreSystem extends Mod {
             }
         });
 
-/*
-        //如果激活就执行下面
-        if (主动关闭激活 == false){
-            if (ActivateProgram.isActivated == true) {
-                //炫彩光标
-                if(炫彩光标 == true) {
-                    Cursor.CToverrideUI();
-                }else {
-                    Cursor0.CToverrideUI();
-                }
-            }else {
-                Cursor0.CToverrideUI();
-            }
-        }else {
-            Cursor0.CToverrideUI();
-        }*/
 //如果激活就执行下面
         if (主动关闭激活 == false && ActivateProgram.isActivated == true && 炫彩光标 == true) {
             Cursor.CToverrideUI();
@@ -451,50 +524,35 @@ public class CtCoreSystem extends Mod {
 
       }
 
-        //覆盖原版难度选择
-        try {
-            Field field = PlanetDialog.class.getDeclaredField("campaignRules");
-            field.setAccessible(true);
-            field.set(ui.planet, new CTCampaignRulesDialog());
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
     }
+
    //百倍变速
    public static void 百倍变速() {
        Events.on(EventType.ClientLoadEvent.class, e -> {
-           final boolean[] first = {true}; // 使用数组包装布尔值以在lambda中修改
-
+           // 移除保存的设置值，让它使用新的默认值
+           Core.settings.remove(Core.bundle.format("9527xiao"));
            Vars.ui.settings.game.sliderPref(
                    Core.bundle.format("9527xiao"), // 标签
-                   100, // 默认值
-                   100, // 最小值
-                   10000, // 最大值
-                   1000, // 步长
+                   1, // 默认值：1（对应1倍速）
+                   1, // 最小值：1（对应1倍速）
+                   100, // 最大值：100（对应100倍速）
+                   10, // 步长：10（可以精细调整）
                    i -> { // 滑块值变化时的回调函数
-                       if (first[0]) {
-                           first[0] = false;
-                           return null; // Java中回调函数需要返回值，这里返回null
-                       }
-
-                       float s = i / 100f;
+                       // 直接使用滑块值作为速度倍数，无需再除以100
+                       float s = i;
                        Time.setDeltaProvider(() -> Math.min(Core.graphics.getDeltaTime() * 60 * s, 3 * s));
-
-                 /*      // 添加发送聊天消息的代码，通知所有玩家游戏速度已调整
-                       if (Vars.net.active() && (Vars.net.server() || Vars.player.admin)) {
-                           Call.sendMessage("[yellow]游戏速度已调整为" + s + "倍");
-                       }*/
 
                        // 只在速度为1倍或100倍时发送消息  + 只在联机模式下，并且是主机时发送聊天消息 防止刷屏
                        if ((s == 1.0f || s == 100.0f) && Vars.net.active() && Vars.net.server()) {
-                           Call.sendMessage("[yellow]我已将游戏速度调整为" + s + "倍");
+                           Call.sendMessage("[yellow]房主已将游戏速度调整为" + s + "倍");
                        }
 
-                       return i / 100f + "X"; // 返回显示的文本
+                       return i + "X"; // 返回显示的文本，直接显示倍数
                    }
            );
        });
    }
+
     //选择方块显示图标
     public void CT3选择方块显示图标() {
         Events.run(EventType.Trigger.draw, () -> {
@@ -526,7 +584,7 @@ public class CtCoreSystem extends Mod {
                         Unloader.UnloaderBuild source = (Unloader.UnloaderBuild) b;
                         if (source.config() != null) {
                             Draw.z(Layer.block + 1);
-                            Draw.rect(source.config().fullIcon, b.x, b.y, 3, 3);
+                            Draw.rect(source.config().fullIcon, b.x, b.y, 6, 6);
                         }
                     }
                     //定向装卸器
@@ -534,7 +592,7 @@ public class CtCoreSystem extends Mod {
                         DirectionalUnloader.DirectionalUnloaderBuild source = (DirectionalUnloader.DirectionalUnloaderBuild) b;
                         if (source.config() != null) {
                             Draw.z(Layer.block + 1);
-                            Draw.rect(source.config().fullIcon, b.x, b.y, 3, 3);
+                            Draw.rect(source.config().fullIcon, b.x, b.y, 6, 6);
                         }
                     }
                 });
@@ -629,12 +687,22 @@ public class CtCoreSystem extends Mod {
             // 添加默认的确定按钮
             // buttons.button("@ok", this::hide).size(110, 50).pad(4);
             button("@restart", () -> Core.app.exit()).center().pad(16).width(200f).fill().row();
+            button("@wait", this::hide).size(300, 50).pad(4).center().row();
             add(Core.bundle.format("CTreloadrequired")).pad(4).center().row();
             // keyDown(KeyCode.enter, this::hide);
             // closeOnBack();
         }}.show();
     }
-
+    // 强制退出游戏弹窗
+    public static void showCoercivenessExitDialog(String title, Consumer<Table> contBuilder) {
+        new Dialog(title) {{
+            contBuilder.accept(cont);
+            row();
+            // 添加游戏退出按钮
+            button("@restart", () -> Core.app.exit()).center().pad(16).width(200f).fill().row();
+            add(Core.bundle.format("CTreloadrequired")).pad(4).center().row();
+        }}.show();
+    }
     //自定义弹窗
     public static void PopUpWindow(String title, Consumer<Table> contBuilder) {
         new Dialog(title) {{

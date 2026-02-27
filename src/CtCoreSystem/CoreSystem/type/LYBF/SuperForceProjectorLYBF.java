@@ -1,5 +1,6 @@
 package CtCoreSystem.CoreSystem.type.LYBF;
 
+import CtCoreSystem.CoreSystem.type.Ovulam5480.BulletType.percentBulletType;
 import arc.func.Cons;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
@@ -7,15 +8,20 @@ import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
 import arc.math.Mathf;
 import arc.math.geom.Intersector;
+import arc.math.geom.Vec2;
 import arc.scene.event.Touchable;
 import arc.scene.ui.Image;
 import arc.scene.ui.Label;
 import arc.scene.ui.Slider;
 import arc.scene.ui.layout.Table;
+import arc.struct.Seq;
 import arc.util.Reflect;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import mindustry.Vars;
+import mindustry.entities.Effect;
+import mindustry.entities.bullet.BulletType;
+import mindustry.entities.bullet.LightningBulletType;
 import mindustry.game.Team;
 import mindustry.gen.Bullet;
 import mindustry.gen.Groups;
@@ -23,6 +29,9 @@ import mindustry.gen.Icon;
 import mindustry.gen.Unit;
 import mindustry.ui.Styles;
 import mindustry.world.blocks.defense.ForceProjector;
+import mindustry.world.meta.Stat;
+
+import java.lang.reflect.Method;
 
 import static CtCoreSystem.CoreSystem.type.CTColor.C;
 import static arc.Core.bundle;
@@ -34,13 +43,34 @@ import static arc.Core.bundle;
  * 超级无敌秒杀力场
  */
 public class SuperForceProjectorLYBF extends ForceProjector {
+    //产生的子弹
+    public BulletType bullet ;
+    //间隔时间
+    public float 间隔Time = 30f;
+    //劈里啪啦总时间, 不要超过间隔时间
+    public float bilibiliTime = 20f;
+
+
     public SuperForceProjectorLYBF(String name) {
         super(name);
         configurable = true;
+        shieldHealth = 9999999;
+        cooldownNormal = 9999999;
+        phaseUseTime=1;
+       /* bullet =  new LightningBulletType() {{
+            damage = 100;
+            lightningLength = 6;
+        }};*/
+        bullet = new percentBulletType.healthBulletType(980) {{
+            speed = 0;
+            damage = 100;
+            lifetime = 5;
+        }};
     }
 
 
     protected static SuperForceProjectorLYBFBuild paramEntity;
+    protected static Effect paramEffect; // 添加这一行
     protected static final Cons<Bullet> destroyAttacker = bullet -> {
         if (bullet.team != paramEntity.team && bullet.type.absorbable &&
                 Intersector.isInRegularPolygon(((SuperForceProjectorLYBF) (paramEntity.block)).sides, paramEntity.x, paramEntity.y, paramEntity.realRadius(), ((SuperForceProjectorLYBF) (paramEntity.block)).shieldRotation, bullet.x, bullet.y)) {
@@ -56,14 +86,43 @@ public class SuperForceProjectorLYBF extends ForceProjector {
         public float dynamicRadius = radius;
         public boolean killUnit = false;
         public boolean killSpecialUnit = false;
-
         public int killSpecialUnitTimer = timers++;
+
+        public float 间隔Timer;
+        public float bilibiliTimer, preTime;
+        public Seq<Vec2> pos = new Seq<>();
+        public int ampint;
 
         @Override
         public void updateTile() {
             super.updateTile();
             if (killUnit) {
-                unitKiller();
+                if (间隔Timer < 间隔Time) 间隔Timer += edelta();
+                else {
+                    pos.clear();
+                    Groups.unit.intersect(x - realRadius(), y - realRadius(), realRadius() * 2f, realRadius() * 2f, unit -> {
+                        if (unit.team != team && unit.type.targetable && Intersector.isInRegularPolygon(sides, x, y, realRadius(), shieldRotation, unit.x, unit.y)) {
+                            间隔Timer = 0;
+                            pos.add(new Vec2(unit.x, unit.y));
+                        }
+                    });
+                    Vars.indexer.eachBlock(null, x, y, realRadius() * 2f, building -> building.team != team && building.block.targetable, building -> {
+                        if (Intersector.isInRegularPolygon(sides, x, y, realRadius(), shieldRotation, building.x, building.y)) {
+                            间隔Timer = 0;
+                            pos.add(new Vec2(building.x, building.y));
+                        }
+                    });
+                    ampint = pos.size;
+                }
+                if (!pos.isEmpty()) {
+                    preTime = bilibiliTimer;
+                    for (bilibiliTimer += edelta(); preTime < bilibiliTimer; preTime += bilibiliTime / ampint) {
+                        if (pos.isEmpty()) break;
+                        Vec2 vec2 = pos.first();
+                        bullet.create(this, vec2.x, vec2.y, Mathf.random(360));
+                        pos.remove(vec2);
+                    }
+                }
             }
             if (killSpecialUnit) {
                 unitKiller();
@@ -72,14 +131,27 @@ public class SuperForceProjectorLYBF extends ForceProjector {
                 }
             }
         }
+        private Class<?> empathyDamageClass;
+        private Method resetMethod;
+        private void initReflection() {
+            try {
+                empathyDamageClass = Class.forName("flame.unit.empathy.EmpathyDamage");
+                resetMethod = empathyDamageClass.getMethod("reset");
+            } catch (Exception ignored) {}
+        }
+
+        @Override
+        public void created() {
+            super.created();
+            initReflection();  // 在创建时初始化反射
+        }
 
         private void killSpecialUnit() {
             try {
-                Class<?> empathyDamage = Class.forName("flame.unit.empathy.EmpathyDamage");
-                Reflect.invoke(empathyDamage, "reset");
-            } catch (Exception ignored) {
-
-            }
+                if (resetMethod != null) {
+                    resetMethod.invoke(null);  // 调用静态方法
+                }
+            } catch (Exception ignored) {}
         }
 
         @Override
@@ -260,5 +332,14 @@ public class SuperForceProjectorLYBF extends ForceProjector {
         }
 
     }
-
+    public void setStats() {
+        super.setStats();
+        this.stats.remove(Stat.booster);
+        stats.remove(Stat.booster);
+        stats.remove( Stat.shieldHealth);
+        stats.remove( Stat.cooldownTime);
+        stats.remove( Stat.liquidCapacity);
+        stats.remove( Stat.itemCapacity);
+        // stats.remove(Stat.range);
+    }
 }

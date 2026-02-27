@@ -8,6 +8,7 @@ import mindustry.graphics.Layer;
 import mindustry.world.blocks.defense.OverdriveProjector;
 
 import static CtCoreSystem.CoreSystem.type.CTColor.C;
+import static CtCoreSystem.CtCoreSystem.修复超速仪范围显示开关;
 
 //超速仪的范围圈动画
 public class CTOverdriveProjector extends OverdriveProjector {
@@ -33,7 +34,7 @@ public class CTOverdriveProjector extends OverdriveProjector {
             Lines.circle(x,y,realRange * progress);
 
             Draw.reset();
-            Lines.stroke(0.5f,C("ffffff").a(0.6f));
+            Lines.stroke(0.5f,C("ffffff").a(!修复超速仪范围显示开关 ? 0.6f : 0f));
             Lines.circle(x,y,realRange);
         }
     }

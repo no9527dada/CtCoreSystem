@@ -3,6 +3,7 @@ package CtCoreSystem.CoreSystem.type.MultiCrafter;
  * 这个是需要 科技解锁合成的资源后 才能选择该资源合成 的工厂
  * */
 
+import CtCoreSystem.CoreSystem.type.No9527.BlockTextRenderer;
 import CtCoreSystem.CoreSystem.type.V8.ItemDisplay;
 import CtCoreSystem.CoreSystem.type.V8.ItemImage;
 import CtCoreSystem.CoreSystem.type.V8.LiquidDisplay;
@@ -44,6 +45,7 @@ import mindustry.world.meta.Attribute;
 import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
 
+import static CtCoreSystem.CtCoreSystem.方块贴图;
 import static arc.Core.bundle;
 import static arc.Core.scene;
 import static CtCoreSystem.CoreSystem.draw.CreatorsStyles.clearToggleTransi;
@@ -305,7 +307,12 @@ public class CT3_MultiCrafter extends GenericCrafter {
 
         @Override
         public void draw() {
-            super.draw();
+            if(方块贴图==true) {
+                drawer.draw(this);
+            }else {
+                // 使用工具类渲染方块文字
+                BlockTextRenderer.renderBlockText(x, y, localizedName, block.size);
+            }
         }
 
         @Override

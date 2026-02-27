@@ -1,23 +1,21 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
-//
-
 package CtCoreSystem.CoreSystem.type;
 
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.util.Time;
-
-import java.util.Iterator;
-
 import mindustry.Vars;
 import mindustry.gen.Building;
 import mindustry.type.Item;
 import mindustry.type.Liquid;
+import mindustry.world.blocks.heat.HeatBlock;
 import mindustry.world.blocks.power.PowerNode;
 
+import java.util.Iterator;
+
 public class XVXSource extends PowerNode {
+    public float heatOutput = Float.MAX_VALUE; // 无限热量输出
+    public float warmupRate = 0.15f;
+
     public XVXSource(String name) {
         super(name);
         this.maxNodes = 0;
@@ -31,13 +29,19 @@ public class XVXSource extends PowerNode {
         };
     }
 
-    public class XVXSourceBuild extends PowerNode.PowerNodeBuild {
+    public class XVXSourceBuild extends PowerNode.PowerNodeBuild implements HeatBlock {
+        public float heat;
+
         public XVXSourceBuild() {
             super();
         }
 
         public void updateTile() {
             super.updateTile();
+
+            // 更新热量
+            this.heat = XVXSource.this.heatOutput;
+
             Iterator var1 = this.proximity.iterator();
 
             while (var1.hasNext()) {
@@ -68,7 +72,6 @@ public class XVXSource extends PowerNode {
                     }
                 }
             }
-
         }
 
         public float getPowerProduction() {
@@ -86,7 +89,14 @@ public class XVXSource extends PowerNode {
             XVXSource.this.laserColor2 = RGB;
         }
 
+        @Override
+        public float heat() {
+            return this.heat;
+        }
+
+        @Override
+        public float heatFrac() {
+            return this.heat / XVXSource.this.heatOutput;
+        }
     }
 }
-
-

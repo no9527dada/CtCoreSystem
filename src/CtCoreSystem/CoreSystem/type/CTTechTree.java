@@ -8,6 +8,7 @@ import mindustry.content.TechTree;
 import mindustry.ctype.UnlockableContent;
 import mindustry.game.Objectives;
 import mindustry.type.ItemStack;
+import mindustry.type.SectorPreset;
 import mindustry.world.Block;
 
 import java.lang.reflect.Method;
@@ -37,7 +38,7 @@ public class CTTechTree {
      * @param objectives   目标
      * @param ItemMultiplier 物品倍率
      */
-    public static void addToTree(UnlockableContent content, UnlockableContent parent, ItemStack[] requirements, Seq<Objectives.Objective> objectives, float ItemMultiplier) {
+    public static void addToTree(UnlockableContent content, UnlockableContent parent, ItemStack[] requirements,Seq<Objectives.Objective> objectives, float ItemMultiplier) {
         // 检查content是否为null
         if (content == null) {
             Log.err("尝试将空内容添加到科技树，父节点: " + (parent != null ? parent.name : "父节点也为空！你可真TM牛逼！！"));
@@ -50,7 +51,11 @@ public class CTTechTree {
             return;
         }
 
-
+       /* // 检查被研究的内容是否为null
+        if (objectives == null) {
+            Log.err("尝试将子内容:" + content.name + " 添加到科技树，但研究或占领需求项目为空值，无法完成目标");
+            return ;
+        }*/
         // 移除已存在的相同内容节点
         TechTree.all.each(t -> t.content == content, TechTree.TechNode::remove);
 

@@ -7,6 +7,7 @@ import arc.util.Time;
 import mindustry.content.Fx;
 import mindustry.world.blocks.defense.MendProjector;
 
+import static CtCoreSystem.CtCoreSystem.修复超速仪范围显示开关;
 import static mindustry.Vars.indexer;
 import static mindustry.Vars.tilesize;
 
@@ -33,7 +34,7 @@ public class CTMendProjector2 extends MendProjector {
             Lines.stroke((2f * f + 0.2f) * heat);
             Lines.square(x, y, Math.min(1f + (1f - f) * size * tilesize / 2f, size * tilesize/2f));
             Draw.reset();
-            Lines.stroke(1f, baseColor.a(0.5f));
+            Lines.stroke(1f, baseColor.a(!修复超速仪范围显示开关 ? 0.3f : 0f));
             Lines.dashCircle(x, y, realRange);
 
         }

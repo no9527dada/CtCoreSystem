@@ -5,10 +5,15 @@ import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
 import arc.math.Mathf;
+import arc.scene.ui.layout.Table;
 import arc.util.Time;
 import mindustry.entities.abilities.ForceFieldAbility;
 import mindustry.gen.Groups;
 import mindustry.gen.Unit;
+import mindustry.graphics.Pal;
+import mindustry.ui.Bar;
+
+import static CtCoreSystem.CtCoreSystem.toText;
 
 
 // 自定义延迟恢复护盾能力类
@@ -22,6 +27,8 @@ public class DelayedForceFieldAbility extends ForceFieldAbility {
     public DelayedForceFieldAbility(float radius, float regen, float max, float cooldown) {
         super(radius, regen, max, cooldown);
     }
+    // UI 显示名称
+    public String localizedName = toText("ability-delayed-force-field");
 
     /*    // 构造函数，允许自定义恢复延迟时间
         public DelayedForceFieldAbility(float radius, float regen, float max,  float delay) {
@@ -94,6 +101,7 @@ public class DelayedForceFieldAbility extends ForceFieldAbility {
             radiusScale = 0f;
         }
     }
+
     //现在我需要在单位的上方显示一个长条矩形，用于动态显示护盾值的恢复量的进度
     // 重写draw方法，确保护盾绘制范围与实际碰撞范围一致
     @Override

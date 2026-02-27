@@ -85,6 +85,26 @@ public class NewFx {
             });
         });
     }
+    //生成一个正方形 由小变大 变化的期间且旋转。然后正方形里面生成一个空心圆 跟着正方形由小变大
+    public static Effect 正套圆(float lifetime, int size,Color color) {
+        return  new Effect(lifetime*60.0F, (e) -> {
+            Draw.z(110);
+            //生成一个正方形 由小变大 变化的期间且旋转。然后正方形里面生成一个空心圆 跟着正方形由小变大
+            Draw.color(color);
+            // 前80%时间保持完全不透明，后20%时间逐渐透明化
+            float t = e.fin(); // 获取当前进度 0~1
+            float alpha = t < 0.8f ? 1.0f : (1.0f - (t - 0.8f) * 2.0f);
+            Draw.alpha(Mathf.clamp(alpha));
+            float sizes=size*8f;
+            float squareSize = e.fin() * (5f+sizes); // 正方形大小随时间由小变大
+            float rotation = e.time * 8f; // 旋转速度
+            Lines.stroke(0.7f);
+            Lines.square(e.x, e.y, squareSize, rotation);
+            float circleSize = e.fin() * (0f+sizes); // 圆形大小稍小，形成内部效果
+            Lines.stroke(0.5f);
+            Lines.circle(e.x, e.y, circleSize);
+        });
+    }
 
     /*////////////////////////////////////*/
     public static Effect 制裁子弹消失, 灭亡子弹消失;

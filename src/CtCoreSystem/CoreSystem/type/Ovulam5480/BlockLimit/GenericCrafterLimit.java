@@ -1,5 +1,6 @@
 package CtCoreSystem.CoreSystem.type.Ovulam5480.BlockLimit;
 
+import CtCoreSystem.CoreSystem.type.No9527.建筑贴图隐藏.*;
 import arc.Core;
 import mindustry.Vars;
 import mindustry.game.Team;
@@ -12,7 +13,7 @@ import mindustry.world.blocks.storage.CoreBlock;
 public class GenericCrafterLimit {
 
     //普通工厂
-    public static class 工厂数量限制 extends GenericCrafter {
+    public static class 工厂数量限制 extends newGenericCrafter {
         //  数字代表允许建筑的数量，最多是数字的值+1
         public int 数量 = 1;
 
@@ -55,7 +56,7 @@ public class GenericCrafterLimit {
         }
     }
 
-    public static class 工厂前置限制 extends GenericCrafter {
+    public static class 工厂前置限制 extends newGenericCrafter {
         // 前置方块存在场上的数量，低于数字的值则不允许建造
         public int 数量 = 1;
 
