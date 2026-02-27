@@ -19,13 +19,13 @@ java{
 
 ext{
     //the build number that this mod is made for
-    mindustryVersion = 'v153'
+    mindustryVersion = 'v154'
     jabelVersion = "0.8.0"
     //windows sucks
     isWindows = System.getProperty("os.name").toLowerCase().contains("windows")
     sdkRoot = System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT")
     // 添加自定义输出路径，可通过命令行参数-PoutputPath覆盖
-    customOutputPath = project.hasProperty('outputPath') ? project.property('outputPath') : "H:\\SteamLibrary\\steamapps\\common\\Mindustry\\saves\\mods"
+    //customOutputPath = project.hasProperty('outputPath') ? project.property('outputPath') : "H:\\SteamLibrary\\steamapps\\common\\Mindustry\\saves\\mods"
 }
 
 //java 8 backwards compatibility flag
@@ -36,14 +36,10 @@ allprojects{
 }
 
 dependencies{
-   //implementation 'com.fasterxml.jackson.core:jackson-core:2.9.0'
-   //implementation 'com.fasterxml.jackson.databind:jackson-databind:2.9.0'
     implementation 'org.jetbrains:annotations:20.1.0'
     compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
     compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
     annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
-    compileOnly files("F:\\JAVA_MDT\\Mindustry源码\\154.jar")
-   compileOnly files("F:\\JAVA_MDT\\CT2起源\\build\\libs\\CT2起源源码.jar")
 
 }
 

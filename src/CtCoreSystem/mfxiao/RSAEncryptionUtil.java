@@ -4,8 +4,8 @@ import arc.Core;
 import arc.graphics.Color;
 import arc.scene.ui.TextField;
 import arc.util.Log;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import arc.util.serialization.JsonReader;
+import arc.util.serialization.JsonValue;
 import mindustry.Vars;
 import mindustry.ui.dialogs.BaseDialog;
 
@@ -14,6 +14,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -37,8 +38,15 @@ public class RSAEncryptionUtil {
             while ((line = reader.readLine()) != null) {
                 response.append(line);
             }
-            ObjectMapper mapper = new ObjectMapper();
-            return mapper.readValue(response.toString(), new TypeReference<Map<String, String>>() {});
+            Map<String, String> data = new HashMap<>();
+            JsonReader jsonReader = new JsonReader();
+            JsonValue jsonValue = jsonReader.parse(response.toString());
+            for (JsonValue value : jsonValue) {
+                data.put(value.name, value.asString());
+            }
+            return data;
+//            ObjectMapper mapper = new ObjectMapper();
+//            return mapper.readValue(response.toString(), new TypeReference<Map<String, String>>() {});
         } finally {
             connection.disconnect();
         }
@@ -140,7 +148,7 @@ public class RSAEncryptionUtil {
             String decryptedOrderId = decrypted.toString();
             if (calculateChecksum(decryptedOrderId) == checksum) {
                 Log.info("激活码验证成功");
-               // Log.info("激活码正确：" + encryptedOrderId);
+                // Log.info("激活码正确：" + encryptedOrderId);
                 return decryptedOrderId;
             } else {
                 Log.err("解密订单号时出错3：" + encryptedOrderId);
@@ -154,14 +162,13 @@ public class RSAEncryptionUtil {
     }
 
     // 计算简单校验和
-    public  static int calculateChecksum(String orderId) {
+    public static int calculateChecksum(String orderId) {
         int sum = 0;
         for (char c : orderId.toCharArray()) {
             sum += (int) c;
         }
         return sum % 1000; // 取模限制范围
     }
-
 
 
     //显示创作者专用的秘钥生成对话框

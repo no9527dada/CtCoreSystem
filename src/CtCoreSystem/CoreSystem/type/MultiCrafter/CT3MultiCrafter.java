@@ -1,6 +1,7 @@
 package CtCoreSystem.CoreSystem.type.MultiCrafter;
 /*选择多合成*/
 
+import CtCoreSystem.CoreSystem.Icons;
 import CtCoreSystem.CoreSystem.type.No9527.BlockTextRenderer;
 import CtCoreSystem.CoreSystem.type.V8.ItemDisplay;
 import CtCoreSystem.CoreSystem.type.V8.ItemImage;
@@ -11,10 +12,9 @@ import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.TextureRegion;
 import arc.math.Mathf;
+import arc.scene.style.ScaledNinePatchDrawable;
 import arc.scene.style.TextureRegionDrawable;
-import arc.scene.ui.Button;
-import arc.scene.ui.ButtonGroup;
-import arc.scene.ui.ImageButton;
+import arc.scene.ui.*;
 import arc.scene.ui.layout.Table;
 import arc.struct.ObjectSet;
 import arc.util.Strings;
@@ -67,6 +67,7 @@ public class CT3MultiCrafter extends GenericCrafter {
     public float updateEffectChance = 0.04f;
     public boolean showLiquid = false; // 控制显示液体还是物品
     public boolean useVerticalRecipeLayout = false; // false为旧版，true为新版垂直布局
+
     public CT3MultiCrafter(String name, CreatorsRecipe[] recs) {
         super(name);
         this.recs = recs;
@@ -77,7 +78,7 @@ public class CT3MultiCrafter extends GenericCrafter {
         config(Integer.class, (ChooseMultiCrafterBuild b, Integer i) -> {
             b.IDD = i;
         });
-    // 配置新交互方式切换
+        // 配置新交互方式切换
         config(Boolean.class, (ChooseMultiCrafterBuild b, Boolean useVertical) -> {
             useVerticalRecipeLayout = useVertical;
         });
@@ -118,9 +119,9 @@ public class CT3MultiCrafter extends GenericCrafter {
         this(name, new CreatorsRecipe[recLen]);
     }
 
-   @Override
-public void setBars() {
-    super.setBars();
+    @Override
+    public void setBars() {
+        super.setBars();
     /*removeBar("power");
     addBar("power", (ChooseMultiCrafter.ChooseMultiCrafterBuild entity) ->
             new Bar(() -> bundle.format("bar.powerA", Strings.fixed(entity.block.consPower.requestedPower(entity) * 60 * entity.timeScale(), 1)),
@@ -128,32 +129,32 @@ public void setBars() {
                     () -> entity.power.status)
     );*/
 
-    removeBar("liquid");
-    removeBar("items");
-    if (!powerBarI && hasPower) removeBar("power");
-    if (powerBarO) {
-        addBar("poweroutput", (ChooseMultiCrafterBuild entity) ->
-                new Bar(() -> bundle.format("bar.poweroutputB", Strings.fixed(entity.getPowerProduction() * 60 * entity.timeScale(), 1)),
+        removeBar("liquid");
+        removeBar("items");
+        if (!powerBarI && hasPower) removeBar("power");
+        if (powerBarO) {
+            addBar("poweroutput", (ChooseMultiCrafterBuild entity) ->
+                    new Bar(() -> bundle.format("bar.poweroutputB", Strings.fixed(entity.getPowerProduction() * 60 * entity.timeScale(), 1)),
+                            () -> Pal.powerBar,
+                            () -> entity.power.status)
+            );
+        }
+        if (!liquidSet.isEmpty()) {
+            liquidSet.each(k -> addBar(k.localizedName, entity -> new Bar(
+                    () -> k.localizedName + "[" + Math.round(entity.liquids.get(k)) + "]",
+                    k::barColor,
+                    () -> entity.liquids.get(k) / liquidCapacity
+            )));
+        }
+
+        addBar("配方条", (ChooseMultiCrafterBuild e) ->
+                new Bar(
+                        () -> bundle.format("bar.warmup", Math.floor(e.进度条(e.IDD) * 100.0f) + " %"),
                         () -> Pal.powerBar,
-                        () -> entity.power.status)
+                        () -> e.进度条(e.IDD)
+                )
         );
     }
-    if (!liquidSet.isEmpty()) {
-        liquidSet.each(k -> addBar(k.localizedName, entity -> new Bar(
-            () -> k.localizedName + "[" + Math.round(entity.liquids.get(k)) + "]",
-            k::barColor,
-            () -> entity.liquids.get(k) / liquidCapacity
-        )));
-    }
-
-    addBar("配方条", (ChooseMultiCrafterBuild e) ->
-            new Bar(
-                    () -> bundle.format("bar.warmup", Math.floor(e.进度条(e.IDD) * 100.0f) + " %"),
-                    () -> Pal.powerBar,
-                    () -> e.进度条(e.IDD)
-            )
-    );
-}
 
 
     @Override
@@ -288,7 +289,8 @@ public void setBars() {
         public int IDD = 0;
         public boolean[] 生产状态 = new boolean[recs.length];
         public float[] 加工时间 = new float[recs.length];
-        public  Color getStatusColor() {
+
+        public Color getStatusColor() {
 
             // 检查是否有配方满足输入条件但无法输出（待机状态）
             for (var i = 0; i < recs.length; i++) {
@@ -303,7 +305,8 @@ public void setBars() {
             }
             return Pal.remove; // 缺失时红色
         }
-         boolean 检测输出阻塞(CreatorsRecipe.OutputContents output) {
+
+        boolean 检测输出阻塞(CreatorsRecipe.OutputContents output) {
             // 检查物品输出是否会被阻塞
             if (output.items != null) {
                 for (var itemStack : output.items) {
@@ -335,19 +338,20 @@ public void setBars() {
 
             return false; // 没有输出阻塞
         }
+
         @Override
         public void draw() {
-            if(方块贴图==true) {
+            if (方块贴图 == true) {
                 drawer.draw(this);
-            }else {
+            } else {
                 // 使用工具类渲染方块文字
                 BlockTextRenderer.renderBlockText(x, y, localizedName, block.size);
             }
             // 绘制状态指示灯
-            if (this.block.enableDrawStatus ) {
+            if (this.block.enableDrawStatus) {
                 float multiplier = this.block.size > 1 ? 1.0F : 0.64F;
-                float brcx = this.x + (float)(this.block.size * 8) / 2.0F - 8.0F * multiplier / 2.0F;
-                float brcy = this.y - (float)(this.block.size * 8) / 2.0F + 8.0F * multiplier / 2.0F;
+                float brcx = this.x + (float) (this.block.size * 8) / 2.0F - 8.0F * multiplier / 2.0F;
+                float brcy = this.y - (float) (this.block.size * 8) / 2.0F + 8.0F * multiplier / 2.0F;
 
                 Draw.z(71.0F);
                 Draw.color(Pal.gray);
@@ -357,6 +361,7 @@ public void setBars() {
                 Draw.color();
             }
         }
+
         @Override
         public void buildConfiguration(Table table) {
             if (!useVerticalRecipeLayout) {
@@ -406,18 +411,22 @@ public void setBars() {
                 }
             }
         }
+
         // 新版垂直布局方法
         private void newVerticalBuildConfiguration(Table table) {
             ButtonGroup<ImageButton> group = new ButtonGroup<>();
             group.setMinCheckCount(0);
             group.setMaxCheckCount(1);
 
+
+            table.setBackground(Tex.whiteui);
             for (var i = 0; i < recs.length; i++) {
                 int finalI = i;
 
                 // 创建水平布局容器
                 int finalI1 = i;
                 table.table(recipeRow -> {
+                    recipeRow.setBackground(Tex.scrollKnobVerticalBlack);
                     // 输出品图标
                     TextureRegion outputIcon;
                     if (ItemLiquid == null) {
@@ -429,34 +438,35 @@ public void setBars() {
                                 recs[finalI1].output.items[0].item.uiIcon : recs[finalI1].output.liquids[0].liquid.uiIcon;
                     }
 
-                    recipeRow.image(outputIcon).size(40);
-                    recipeRow.image(Icon.left).size(20); // 向右箭头（从左到右的布局）
+                    recipeRow.image(outputIcon).size(30);
+                    recipeRow.image(Icon.left).size(20).pad(5); // 向右箭头（从左到右的布局）
 
                     // 输入品图标（仅显示图标，不显示数量）
                     if (recs[finalI1].input.items != null) {
                         for (ItemStack inputItem : recs[finalI1].input.items) {
-                            recipeRow.image(inputItem.item.uiIcon).size(40);
+                            recipeRow.image(inputItem.item.uiIcon).size(30).pad(2);
                         }
                     }
                     if (recs[finalI1].input.liquids != null) {
                         for (LiquidStack inputLiquid : recs[finalI1].input.liquids) {
-                            recipeRow.image(inputLiquid.liquid.uiIcon).size(40);
+                            recipeRow.image(inputLiquid.liquid.uiIcon).size(30).pad(2);
                         }
                     }
 
                     // 配方选择按钮
-                    ImageButton button = recipeRow.button(Tex.whiteui, clearToggleTransi, 40, () -> {
+                    ImageButton button = recipeRow.button(Tex.whiteui, clearToggleTransi, 30, () -> {
                     }).group(group).get();
                     button.clicked(() -> configure(finalI));
-                    button.update(() -> button.setChecked(IDD == finalI));
-
-     /*               // 添加选中状态指示
-                        //会报错 你修一下
-                    TextureRegion selectedRegion = (TextureRegion) (IDD == finalI ? Tex.buttonDown : Tex.buttonEdge3);
-                    button.getStyle().imageUp = new TextureRegionDrawable(selectedRegion);*/
-                }).fillX().row();
+                    button.update(() -> {
+                        button.setChecked(IDD == finalI);
+                        TextureRegionDrawable selected = new TextureRegionDrawable(Icons.check_selected);
+                        TextureRegionDrawable unselected = new TextureRegionDrawable(Icons.check_unselected);
+                        button.getStyle().imageUp = (IDD == finalI ? selected : unselected);
+                    });
+                }).fillX().padTop(2).row();
             }
         }
+
         @Override
         public void displayConsumption(Table table) {
             if (IDD == -1) {
