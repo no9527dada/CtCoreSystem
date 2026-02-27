@@ -2,20 +2,17 @@ package CtCoreSystem.ui.dialogs;
 
 
 import arc.Core;
-import arc.Events;
 import arc.graphics.Color;
 import arc.scene.ui.ImageButton;
 import arc.scene.ui.Label;
 import arc.scene.ui.Slider;
 import arc.scene.ui.layout.Table;
 import arc.util.Align;
-import arc.util.Log;
 import arc.util.Reflect;
 import arc.util.Time;
-import creators.Creators;
+
 import mindustry.Vars;
 import mindustry.core.UI;
-import mindustry.game.EventType;
 import mindustry.game.Team;
 import mindustry.gen.Groups;
 import mindustry.gen.Icon;
@@ -26,7 +23,6 @@ import mindustry.ui.dialogs.BaseDialog;
 
 import static CtCoreSystem.CtCoreSystem.加载CTTD;
 import static CtCoreSystem.CtCoreSystem.方块贴图;
-import static CtCoreSystem.CtURL.QQ群2;
 import static CtCoreSystem.CtURL.视频教程;
 import static mindustry.gen.Call.sendChatMessage;
 public class 游戏功能按钮 {
@@ -261,7 +257,7 @@ public class 游戏功能按钮 {
                     // 蓝图按钮
                     if (Vars.mods.getMod("creators") != null) {
                         buttons.button(Icon.book, Styles.clearTogglei, () -> {
-                            Creators.CTBlockBool = !Creators.CTBlockBool;
+                            creators.Creators.CTBlockBool = !creators.Creators.CTBlockBool;
                         }).size(46).tooltip(Core.bundle.get("9527lantu")).padRight(4);
                     }
                     // 方块贴图按钮

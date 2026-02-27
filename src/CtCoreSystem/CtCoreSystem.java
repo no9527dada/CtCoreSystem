@@ -232,19 +232,6 @@ public class CtCoreSystem<let> extends Mod {
                 Log.info("本地许可证验证中....");
                 if (ActivateProgram.LICENSE_FILE.exists()) {
                     startActivationProcess();//联网验证激活状态
-                   /* String licenseKey = ActivateProgram.LICENSE_FILE.readString().trim();
-                    Log.info("本地许可证文件存在");
-                    if (!licenseKey.isEmpty()) {
-                        //  onActivationSuccess(); // 设置激活状态
-                        Log.info("联网验证激活状态中...");
-                        startActivationProcess();//联网验证激活状态
-                        Log.info("赞助激活状态确认 " + ActivateProgram.isActivated);
-                    } else {
-                        Log.info("Creators DLC 内容未激活，跳过加载。");
-                        PopUpWindow("", cont -> {
-                            cont.add(Core.bundle.format("activation.error.localfileinvalid"));
-                        });
-                    }*/
                 }else {
                     Log.info("本地许可证文件不存在1");
                     ActivateProgram.isActivated = false;

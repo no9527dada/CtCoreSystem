@@ -119,7 +119,7 @@ public class ActivateProgram {
                 }));
             }else {
                 Log.info("激活状态已改变，需要重启游戏以应用变更");
-                Core.app.post(() -> showCustomDialog("", cont -> {
+                Core.app.post(() -> showCoercivenessExitDialog("", cont -> {
                     cont.add(Core.bundle.format("activation.error.StateChange0")).row();
                 }));
             }
@@ -140,6 +140,25 @@ public class ActivateProgram {
                             String savedPlayerName = parts[0];
                             String savedEncryptedOrderId = parts[1];
 
+                            // 验证当前游戏名与本地存储名是否一致
+                            String currentPlayerName = Vars.player.name();
+                            if (!savedPlayerName.equals(currentPlayerName)) {
+                              //  Log.err("玩家名不匹配：当前玩家名 '" + currentPlayerName + "' 与本地存储的玩家名 '" + savedPlayerName + "' 不符");
+                                Log.err("玩家名未注册");
+                                isActivated = false;
+                                主动关闭激活 = false;
+                                saveActivationState();
+                                // 检查激活状态是否发生变化
+
+
+                                PopUpWindow2("", cont -> {
+                                    cont.add(Core.bundle.format("activation.error.playernamechanged")).row();
+                                });
+                                checkActivationStateChange();
+                                // 删除本地存储的许可证文件
+                                LICENSE_FILE.delete();
+                                return;
+                            }
                             try {
                                 // 解密订单号
                                 String savedOrderId = RSAEncryptionUtil.decryptOrderId(savedEncryptedOrderId);
@@ -228,14 +247,22 @@ public class ActivateProgram {
     // 修改verifyMobileLicenseAsync方法以处理解密失败返回null的情况
     private static void verifyMobileLicenseAsync(String playerName, String orderIds) {
         Dialog processing = new Dialog("");
-        processing.cont.add("@loading").pad(20);
+        processing.cont.add(toText("activation.error.loading")).pad(20);
         processing.setModal(true);
-        processing.hide();//有激活文件后隐藏弹窗
+        processing.show();
 
         // 在后台线程中执行网络请求
         Threads.daemon("Mobile-License-Verification", () -> {
             boolean success = false;
+
             try {
+                // 设置超时时间
+                Time.runTask(300f, () -> { // 300 ticks = 5秒超时
+                    if (processing.isShown()) {
+                        Core.app.post(processing::hide);
+                    }
+                });
+
                 // 直接使用传入的订单号，不再进行解密
                 String orderId = orderIds;
                 if (orderId == null || orderId.isEmpty()) {
@@ -419,7 +446,7 @@ public class ActivateProgram {
     // 这是玩家在填写激活码时调用的方法  会联网进行验证  如果验证成功  会在本地保存一个文件  文件名是玩家名  文件内容是订单号
     private static void verifyMobileKeyAsync(String playerName, String key) {
         Dialog processing = new Dialog("");
-        processing.cont.add("@loading").pad(20);
+        processing.cont.add(toText("activation.error.loading")).pad(20);
         processing.setModal(true);
         processing.show();
 
@@ -427,6 +454,14 @@ public class ActivateProgram {
         Threads.daemon("Mobile-Key-Verification", () -> {
             boolean success = false;
             try {
+                // 设置超时时间
+                Time.runTask(1800f, () -> { // 1800 ticks = 30秒超时
+                    if (processing.isShown()) {
+                        Core.app.post(processing::hide);
+                        Core.app.post(() -> Vars.ui.showInfo("@activation.error.timeout"));
+                    }
+                });
+
                 // 1. 直接调用RSAEncryptionUtil中的fetchValidationData方法获取验证数据
                 Map<String, String> validationData = RSAEncryptionUtil.fetchValidationData();
 
@@ -461,6 +496,7 @@ public class ActivateProgram {
                 String errorMsg = e.getMessage();
                 if (errorMsg != null && errorMsg.contains("gitee.com")) {
                     arc.util.Log.err("许可证验证过程中发生网络异常: 无法连接到验证服务器");
+                    //网络无连接
                     PopUpWindow("", cont -> {
                         cont.add(Core.bundle.format("activation.error.NetworkError"));
                     });
