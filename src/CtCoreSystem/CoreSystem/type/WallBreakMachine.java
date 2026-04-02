@@ -264,7 +264,7 @@ public class WallBreakMachine extends Block {
             getEfficiency(tile.x, tile.y, rotation, dest -> {
                 Drawf.square(dest.drawx(), dest.drawy(), 4, 0, efficiency > 0 ? colors[2] : colors[0]);
                 for (int i = 0; i < size; i++) {
-                    Vars.ui.showLabel("所需挖掘时间:" + alldrillTime / 60 + "S", 0.01F, x, y);
+                    Vars.ui.showLabel("所需挖掘时间:" + alldrillTime / 60 + "S", 1,0.01F, x, y);
                 }
             });
             Draw.rect(block.region, x, y);

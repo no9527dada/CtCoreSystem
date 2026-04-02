@@ -1,31 +1,30 @@
 package CtCoreSystem.ui.dialogs;
 
 
+import CtCoreSystem.CoreSystem.type.MinRi2.ui.AutoSaverDialog;
 import arc.Core;
-import arc.Events;
+import arc.files.Fi;
 import arc.graphics.Color;
 import arc.scene.ui.ImageButton;
 import arc.scene.ui.Label;
 import arc.scene.ui.Slider;
 import arc.scene.ui.layout.Table;
 import arc.util.Align;
-import arc.util.Log;
 import arc.util.Reflect;
 import arc.util.Time;
 import mindustry.Vars;
 import mindustry.core.UI;
-import mindustry.game.EventType;
 import mindustry.game.Team;
 import mindustry.gen.Groups;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
+import mindustry.mod.Mods;
 import mindustry.type.Sector;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 
 import static CtCoreSystem.CtCoreSystem.加载CTTD;
 import static CtCoreSystem.CtCoreSystem.方块贴图;
-import static CtCoreSystem.CtURL.QQ群2;
 import static CtCoreSystem.CtURL.视频教程;
 import static mindustry.gen.Call.sendChatMessage;
 
@@ -262,12 +261,7 @@ public class 游戏功能按钮 {
                     // 蓝图按钮
                     if (Vars.mods.getMod("creators") != null) {
                         buttons.button(Icon.book, Styles.clearTogglei, () -> {
-                            try {//set block state via reflect
-                                boolean bool = Reflect.get(Class.forName("Creators"), "CTBlockBool");
-                                Reflect.set(Class.forName("Creators"), "CTBlockBool", !bool);
-                            } catch (Exception ignored) {
-                            }
-//                            Creators.CTBlockBool = !Creators.CTBlockBool;
+                            creators.Creators.CTBlockBool = !creators.Creators.CTBlockBool;
                         }).size(46).tooltip(Core.bundle.get("9527lantu")).padRight(4);
                     }
                     // 方块贴图按钮
@@ -314,32 +308,54 @@ public class 游戏功能按钮 {
             table.top().left().marginTop(110);
             Vars.ui.hudGroup.fill(cundang -> {
                 // 存档功能实现
-                if (Vars.mods.locateMod("auto_saver") == null) {
-                    // 原版的存档方式
+             //   if (Vars.mods.locateMod("auto-saver") == null) {
                     cundang.button(Icon.upload, Styles.defaulti, () -> {
-                        if (Vars.ios) {
+                        try {
+                            new AutoSaverDialog().show();
+                        } catch (Exception ei) {
+                            // 这里执行一个删除"auto-saver"模组的指令
                             try {
-                                Core.files.local("mindustry-data-export.zip");
-                                Vars.ui.settings.exportData(Core.files.local("mindustry-data-export.zip"));
-                                Vars.platform.shareFile(Core.files.local("mindustry-data-export.zip"));
-                            } catch (Exception e) {
-                                Vars.ui.showException(e);
-                            }
-                        } else {
-                            Vars.platform.showFileChooser(false, "zip", file -> {
-                                try {
-                                    Vars.ui.settings.exportData(file);
-                                    Vars.ui.showInfo("@data.exported");
-                                } catch (Exception e) {
-                                    // 异常处理保持原有逻辑
+                                // 查找并卸载auto-saver模组
+                                Mods.LoadedMod mod = Vars.mods.locateMod("auto-saver");
+                                if (mod != null) {
+                                    // 获取模组文件路径
+                                    Fi modFile = Reflect.get(mod, "file");
+                                    if (modFile != null) {
+                                        modFile.delete(); // 删除模组文件
+                                    }
+                                    // 从模组列表中移除
+                                    Vars.mods.removeMod(mod);
+                                    Vars.ui.showInfo("打开出错，使用原版导出");
                                 }
-                            });
+                            } catch (Exception ee) {
+                               // Log.err("删除auto-saver模组时出错", e);
+                            }
+                            // 然后执行原版的存档方式
+                            if (Vars.ios) {
+                                try {
+                                    Core.files.local("mindustry-data-export.zip");
+                                    Vars.ui.settings.exportData(Core.files.local("mindustry-data-export.zip"));
+                                    Vars.platform.shareFile(Core.files.local("mindustry-data-export.zip"));
+                                } catch (Exception e) {
+                                    Vars.ui.showException(e);
+                                }
+                            } else {
+                                Vars.platform.showFileChooser(false, "zip", file -> {
+                                    try {
+                                        Vars.ui.settings.exportData(file);
+                                        Vars.ui.showInfo("@data.exported");
+                                    } catch (Exception i) {
+                                        // 异常处理保持原有逻辑
+                                    }
+                                });
+                            }
                         }
+
                     }).width(40).height(40).name("ores").tooltip("@data.export");
-                } else {
+               /* } else {
                     // 自动存档方式
                     try {
-                        Object mod = Vars.mods.locateMod("auto_saver");
+                        Object mod = Vars.mods.locateMod("auto-saver");
                         if (mod == null || Reflect.get(mod, "main") == null) return;
                         Object dialog = Reflect.get(Reflect.get(mod, "main"), "recoverDialog");
                         cundang.button(Icon.upload, Styles.defaulti, () -> {
@@ -352,11 +368,9 @@ public class 游戏功能按钮 {
                     } catch (Exception e) {
                         Vars.ui.showException(e);
                     }
-                }
+                }*/
                 cundang.top().left().marginTop(110).marginLeft(40);
             });
-
-
         });
     }
 }

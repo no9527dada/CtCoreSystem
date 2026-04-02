@@ -5,8 +5,11 @@ import CtCoreSystem.CoreSystem.DsShaders;
 import CtCoreSystem.CoreSystem.Icons;
 import CtCoreSystem.CoreSystem.miner.minerRenderer;
 import CtCoreSystem.CoreSystem.type.CTResearchDialog;
+import CtCoreSystem.CoreSystem.type.MinRi2.Main;
+import CtCoreSystem.CoreSystem.type.No9527.CtContentInfoDialog;
 import CtCoreSystem.CoreSystem.type.No9527.Cursor;
 import CtCoreSystem.CoreSystem.type.No9527.Cursor0;
+import CtCoreSystem.CoreSystem.type.No9527.CustomSeedDialog;
 import CtCoreSystem.CoreSystem.type.Ovulam5480.xuetiao.BossBarFragment;
 import CtCoreSystem.CoreSystem.type.VXV.SpawnDraw;
 import CtCoreSystem.content.*;
@@ -29,6 +32,7 @@ import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.TextureRegion;
 import arc.input.KeyCode;
+import arc.math.Mathf;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.Collapser;
 import arc.scene.ui.layout.Table;
@@ -52,6 +56,7 @@ import mindustry.ui.dialogs.ResearchDialog;
 import mindustry.world.Block;
 import mindustry.world.blocks.distribution.DirectionalUnloader;
 import mindustry.world.blocks.distribution.Sorter;
+import mindustry.world.blocks.production.Drill;
 import mindustry.world.blocks.sandbox.ItemSource;
 import mindustry.world.blocks.sandbox.LiquidSource;
 import mindustry.world.blocks.storage.Unloader;
@@ -82,6 +87,11 @@ public class CtCoreSystem<let> extends Mod {
     public static boolean 方块贴图 = Core.settings.getBool("方块贴图", true);
     public static boolean 禁用建筑红叉 = Core.settings.getBool("禁用建筑红叉", false);
     public static boolean 敌人行进路径 = Core.settings.getBool("敌人行进路径", false);
+    public static boolean 是否自定义种子 = Core.settings.getBool("是否自定义种子", false);
+    public static boolean 物品动画文本 = Core.settings.getBool("物品动画文本", true);
+    // 默认种子值
+    public static final int DEFAULT_SEED = Mathf.random(0, 999999);
+    public static final int DEFAULT_BASE_SEED = Mathf.random(0, 999999);
     // public static boolean 强制ui缩放 = Core.settings.getBool("强制ui缩放", false);
     public Seq<String> BaiMingDan = new Seq<>();
 
@@ -134,7 +144,6 @@ public class CtCoreSystem<let> extends Mod {
     }
 
     public CtCoreSystem() {
-        CT3禁用建筑红叉显示();
    /*
     //全队开启无限火力
     for (Team team : Team.all) {
@@ -197,7 +206,7 @@ public class CtCoreSystem<let> extends Mod {
         yuanban.load();
         SourceCodeModification_Sandbox.load();
         // }
-        //实验产物.load();
+        实验产物.load();
         CreatorsModJS.DawnMods();//JS加载器
     /*
    //分类栏ui
@@ -215,7 +224,8 @@ public class CtCoreSystem<let> extends Mod {
     }
 
     public void init() {
-
+        //自动存档模组初始化
+    if(Vars.mods.locateMod("auto-saver") == null) {Main.init();}
         //初始化图标
         Icons.init();
         if (加载CT2()) {
@@ -263,7 +273,7 @@ public class CtCoreSystem<let> extends Mod {
         boolean[] 光标开关 = {false};
         boolean[] 辅助开关 = {false};
         boolean[] ui缩放 = {false};
-
+       // boolean[] 动画文本 = {false};
         ui.settings.addCategory("[accent][创世神][]辅助模式", Icon.chartBar, st -> {
 
             st.checkPref("辅助模式", false, e -> {
@@ -281,6 +291,14 @@ public class CtCoreSystem<let> extends Mod {
             st.checkPref("敌人行进路径", true, e -> {
                 敌人行进路径 = !敌人行进路径;
             });
+            st.checkPref("物品动画文本", true, e -> {
+                物品动画文本 = !物品动画文本;
+                if (物品动画文本) {
+                    Vars.ui.content = new CtContentInfoDialog();
+                } else {
+                    Vars.ui.content = new mindustry.ui.dialogs.ContentInfoDialog();
+                }
+            });
             if (!手机端) {
                 st.checkPref("炫彩光标开关", false, e -> {
                     光标开关[0] = !光标开关[0];
@@ -291,6 +309,12 @@ public class CtCoreSystem<let> extends Mod {
                 激活进入.show();
                 ui.settings.hide();
             })).width(250).height(50).row();
+            if (加载CT2()) {
+                st.button("起源星球种子设置", (() -> {
+                    new CustomSeedDialog();
+                    ui.settings.hide();
+                })).width(250).height(50).row();
+            }
 
      /*     if(手机端){
                 st.checkPref("强制ui缩放", true, e -> {
@@ -305,9 +329,9 @@ public class CtCoreSystem<let> extends Mod {
                     ui.settings.hide();
                 })).width(300).height(50).row();
             }
-            st.button("模组推荐", (() -> {
+     /*       st.button("模组推荐", (() -> {
                 inits();
-            })).width(300).height(50).row();
+            })).width(300).height(50).row();*/
             st.row();
             st.add(Core.bundle.format("ct3-hind")).visible(() -> 辅助开关[0]).row();
             st.add(Core.bundle.format("ct3-hind")).visible(() -> 光标开关[0]).row();
@@ -378,9 +402,11 @@ public class CtCoreSystem<let> extends Mod {
         if (Vars.mods.locateMod("extra-utilities") == null) {
             overrideVersion();
         }
+        if (物品动画文本== true) {  //这里一定不要删除，否则设置里的物品动画文本功能会失效
+            Vars.ui.content = new CtContentInfoDialog();
+        }
 
-        //给单位上血条
- /*
+ /* //给单位上血条
     bossBar.putBarMap(u->u.type== UnitTypes.dagger, Color.valueOf("e35050"), f -> {
             if (f < 0.5f)return Shaders.buildBeam;
             return Shaders.water;
@@ -399,6 +425,15 @@ public class CtCoreSystem<let> extends Mod {
                 Class.forName("mindustryX.VarsX");
             } catch (ClassNotFoundException b) {
                 //科技树全显
+                /*
+                * 功能：
+                * 创建自定义的 CTResearchDialog
+                * 监听原版 ResearchDialog 的显示事件
+                * 当原版科技树打开时：
+                * 显示自定义科技树
+                * 1 帧后隐藏原版科技树
+                * 效果：玩家点击科技树按钮时，看到的是你的 CTResearchDialog，而不是原版的。
+                * */
                 if (科技树全显开关 == true) {
                     CTResearchDialog dialog = new CTResearchDialog();
                     ResearchDialog research = Vars.ui.research;
@@ -472,6 +507,7 @@ public class CtCoreSystem<let> extends Mod {
         }
 
 
+
         Vars.ui.planet = new CT3PlanetDialog();     //区块名显示
         CT3InfoDialog.show();//开屏显示
         CT3选择方块显示图标(); //选择方块显示图标
@@ -482,13 +518,14 @@ public class CtCoreSystem<let> extends Mod {
 
 
         //覆盖原版难度选择
-        try {
+        Vars.ui.campaignRules = new CTCampaignRulesDialog();
+   /*     try {
             Field field = PlanetDialog.class.getDeclaredField("campaignRules");
             field.setAccessible(true);
             field.set(ui.planet, new CTCampaignRulesDialog());
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException(e);
-        }
+        }*/
 
         // Timer.schedule(CTUpdater::checkUpdate, 4);//檢測更新 旧版 未用
 
@@ -505,7 +542,7 @@ public class CtCoreSystem<let> extends Mod {
             }
         });
 
-//如果激活就执行下面
+//如果激活就执行下面 光标功能
         if (主动关闭激活 == false && ActivateProgram.isActivated == true && 炫彩光标 == true) {
             Cursor.CToverrideUI();
         } else {
@@ -601,6 +638,20 @@ public class CtCoreSystem<let> extends Mod {
                             Draw.z(Layer.block + 1);
                             Draw.rect(source.config().fullIcon, b.x, b.y, 6, 6);
                         }
+                    }
+                    //钻头
+                    if (b instanceof Drill.DrillBuild) {
+                        Drill.DrillBuild source = (Drill.DrillBuild) b;
+                            // 永久显示物品图标
+                                float IconSize = 6.0F;
+                                Draw.z(Layer.block + 1);
+                                if (source.dominantItem != null) {
+                                    Draw.z(Layer.effect + 1);
+                                    Draw.mixcol(Color.darkGray, 1.0F);//绘制了黑色阴影
+                                    Draw.rect(source.dominantItem.fullIcon, b.x, b.y - 1f, IconSize, IconSize);
+                                    Draw.reset();
+                                    Draw.rect(source.dominantItem.fullIcon, b.x, b.y, IconSize, IconSize);
+                                }
                     }
                 });
             }

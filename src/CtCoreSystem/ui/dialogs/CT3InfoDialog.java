@@ -1,5 +1,6 @@
 package CtCoreSystem.ui.dialogs;
 
+import CtCoreSystem.CoreSystem.type.VXV.AnimatedStatLabels;
 import CtCoreSystem.mfxiao.激活进入;
 import CtCoreSystem.ui.Award9527;
 import arc.Core;
@@ -43,6 +44,7 @@ public class CT3InfoDialog {
             buttons.defaults().size(210, 64);
             buttons.button("@close", (this::hide)).size(100, 64);//关闭按钮
             cont.pane((table -> {
+
                 table.add(MODname).left().growX().wrap().width(620).maxWidth(620).pad(4).labelAlign(Align.left);
                 table.row();
                 //  new SettingsMenuDialog().show();//原版设置界面 现在不需要
@@ -56,40 +58,44 @@ public class CT3InfoDialog {
                         激活进入.show();
                     }).size(280, 64).left().row();
                 }
-
-                table.add("更新内容:").left().growX().wrap().width(620).maxWidth(620).pad(4).labelAlign(Align.left);
+                table.add(new AnimatedStatLabels.StatLabelNO("更新内容:", 2.0f)).left().growX().wrap().width(620).maxWidth(620).pad(4).labelAlign(Align.left);
                 table.row();
-
-                table.add(Core.bundle.format("ct3-System")+version+":").left().growX().wrap().width(620).maxWidth(620).pad(4).labelAlign(Align.left);
+                table.image().color(Color.valueOf("9e9e9e")).fillX().height(3).pad(10).row();
+                table.add(new AnimatedStatLabels.StatLabel(Core.bundle.format("ct3-System")+version+":", 1.0f,5F, false)).left().growX().wrap().width(620).maxWidth(620).pad(4).labelAlign(Align.left);
                 table.row();
-                table.add(Core.bundle.format("ct3-SystemTXT")+"\n").left().growX().wrap().width(620).maxWidth(620).pad(4).labelAlign(Align.left);
+                table.add(new AnimatedStatLabels.StatLabel(Core.bundle.format("ct3-SystemTXT")+"\n", 1.0f,Color.white, 5)).left().growX().wrap().width(620).maxWidth(620).pad(4).labelAlign(Align.left);
+
                 table.row();
                 if(Vars.mods.locateMod("ct")!=null) {
+                    table.image().color(Color.valueOf("9e9e9e")).fillX().height(3).pad(10).row();
                     table.add(Core.bundle.format("ct3-ct")+ Vars.mods.getMod("ct").meta.version+":").left().growX().wrap().width(620).maxWidth(620).pad(4).labelAlign(Align.left);
                     table.row();
                     table.add(Core.bundle.format("ct3-ctTXT")+"\n").left().growX().wrap().width(620).maxWidth(620).pad(4).labelAlign(Align.left);
                     table.row();
                 }
                 if(Vars.mods.locateMod("ct_fantasy_project")!=null) {
+                    table.image().color(Color.valueOf("9e9e9e")).fillX().height(3).pad(10).row();
                     table.add(Core.bundle.format("ct3-fp") + Vars.mods.getMod("ct_fantasy_project").meta.version+":").left().growX().wrap().width(620).maxWidth(620).pad(4).labelAlign(Align.left);
                     table.row();
                     table.add(Core.bundle.format("ct3-fpTXT")+"\n").left().growX().wrap().width(620).maxWidth(620).pad(4).labelAlign(Align.left);
                     table.row();
                 }
                 if(Vars.mods.locateMod("cttd")!=null) {
+                    table.image().color(Color.valueOf("9e9e9e")).fillX().height(3).pad(10).row();
                     table.add(Core.bundle.format("ct3-td")+  Vars.mods.getMod("cttd").meta.version+":").left().growX().wrap().width(620).maxWidth(620).pad(4).labelAlign(Align.left);
                     table.row();
                     table.add(Core.bundle.format("ct3-tdTXT")+"\n").left().growX().wrap().width(620).maxWidth(620).pad(4).labelAlign(Align.left);
                     table.row();
                 }
                 if(Vars.mods.locateMod("creators")!=null) {
-                    table.add(Core.bundle.format("ct3-creators")+  Vars.mods.getMod("creators").meta.version+":").left().growX().wrap().width(620).maxWidth(620).pad(4).labelAlign(Align.left);
+                    table.image().color(Color.valueOf("9e9e9e")).fillX().height(3).pad(10).row();
+                   table.add(new AnimatedStatLabels.StatLabel(Core.bundle.format("ct3-creators")+  Vars.mods.getMod("creators").meta.version+":", 1.0f,5F, false)).left().growX().wrap().width(620).maxWidth(620).pad(4).labelAlign(Align.left);
                     table.row();
-                    table.add(Core.bundle.format("ct3-creatorsTXT")+"\n").left().growX().wrap().width(620).maxWidth(620).pad(4).labelAlign(Align.left);
+                    table.add(new AnimatedStatLabels.StatLabel(Core.bundle.format("ct3-creatorsTXT")+"\n", 1.0f,Color.white, 5)).left().growX().wrap().width(620).maxWidth(620).pad(4).labelAlign(Align.left);
                     table.row();
                 }
-
-                table.add(Core.bundle.format("ct3-notice")).left().growX().wrap().width(620).maxWidth(620).pad(4).labelAlign(Align.left);
+                table.image().color(Color.valueOf("9e9e9e")).fillX().height(3).pad(10).row();
+                table.add(new AnimatedStatLabels.StatLabelNO(Core.bundle.format("ct3-notice"), 1.0f)).left().growX().wrap().width(620).maxWidth(620).pad(4).labelAlign(Align.left);
                 table.row();
             })).grow().center().maxWidth(770).row();
             String CT3framer = Core.bundle.format("CT3framer");

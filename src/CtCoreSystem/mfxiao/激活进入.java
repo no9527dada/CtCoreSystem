@@ -19,8 +19,6 @@ import static CtCoreSystem.CtURL.爱发电;
 
 public class 激活进入 {
     public static BaseDialog 激活进入dialog;
-
-
     public static void show() {
         激活进入dialog = new BaseDialog("") {{
             addCloseListener();//按esc关闭

@@ -1,0 +1,15 @@
+{
+	"alwaysUnlocked": true,
+	"name":"Map reset tool-地图重置工具",
+"health": 100,
+	"size": 1,
+	"itemCapacity":0,
+	"range": 1,
+	"speed": 1,
+	"bufferCapacity": 500,
+	//"requirements": [],
+	"category": "distribution",
+	"research": "core-shard",
+	"targetable": false,
+	"solid": false
+}

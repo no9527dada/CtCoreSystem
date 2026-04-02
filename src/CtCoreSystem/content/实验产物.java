@@ -2,16 +2,14 @@ package CtCoreSystem.content;
 
 import CtCoreSystem.CoreSystem.type.Fire.CTBeamExtractor;
 import CtCoreSystem.CoreSystem.type.No9527.FanOverdriveProjector;
-import CtCoreSystem.CoreSystem.type.No9527.建筑贴图隐藏.*;
+import CtCoreSystem.CoreSystem.type.No9527.建筑贴图隐藏.newGenericCrafter;
 import CtCoreSystem.content.Effect.NewFx;
 import arc.graphics.Color;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.Lines;
 import arc.math.Mathf;
 import mindustry.content.Fx;
 import mindustry.content.Items;
-import mindustry.entities.Effect;
 import mindustry.entities.Lightning;
+import mindustry.entities.bullet.BulletType;
 import mindustry.entities.bullet.LightningBulletType;
 import mindustry.entities.bullet.PointBulletType;
 import mindustry.type.Category;
@@ -26,7 +24,7 @@ public class 实验产物 {
     public static 实验产物_子弹 实验产物_子弹;
 
     public static void load() {
-        FanOverdriveProjector 实验产物_fan = new FanOverdriveProjector("实验产物fan"){{
+        FanOverdriveProjector 实验产物_fan = new FanOverdriveProjector("实验产物fan") {{
             group = BlockGroup.transportation;
             category = Category.crafting;
             buildVisibility = BuildVisibility.shown;
@@ -40,9 +38,9 @@ public class 实验产物 {
             canOverdrive = true;
             hasLiquids = true;
             hasItems = true;
-            localizedName="实验产物净化厂";
+            localizedName = "实验产物净化厂";
             updateEffect = Fx.lightningCharge;
-            craftEffect = NewFx.正套圆(1,1,Color.valueOf("acff80"));
+            craftEffect = NewFx.正套圆(1, 1, Color.valueOf("acff80"));
             requirements = ItemStack.with(
 
             );
@@ -57,9 +55,10 @@ public class 实验产物 {
 
         实验产物_子弹 = new 实验产物_子弹();
 
+
         new PowerTurret("实验产物") {
             {
-                float brange = range = 140*8f;
+                float brange = range = 140 * 8f;
                 health = 1000000;
                 requirements = ItemStack.with(
                         Items.copper, 2500
@@ -82,7 +81,7 @@ public class 实验产物 {
                     hitShake = 6f;
                     ammoMultiplier = 1f;
                     fragBullets = 1;
-                    fragBullet =  new 实验产物_子弹();
+                    fragBullet = new 实验产物_子弹();
                 }};
             }
         };

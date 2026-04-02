@@ -26,7 +26,7 @@
 
             Lines.rect(float x, float y, float width, float height, float rotation) - 绘制一个普通的空心矩形
             Fill.rect(float x, float y, float width, float height, float rotation) - 绘制一个填充的矩形
-            Draw.rect(x, y, width, height, rotation); // 绘制一个有贴图的效果
+            Draw.rect(Core.atlas.find("贴图文件名字"),x, y, width, height, rotation); // 绘制一个有贴图的效果
 
 
 
